@@ -1,0 +1,58 @@
+openapi: 3.0.0
+paths:
+  /api:
+    get:
+      operationId: AppController_healthCheck
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - App
+  /api/tools/site-summary:
+    post:
+      operationId: ToolsController_getSiteSummary
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebsiteSummaryRequestDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Tools
+  /api/tools/keywords:
+    post:
+      operationId: ToolsController_getKeywords
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KeywordRequestDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - Tools
+info:
+  title: Writwell API
+  description: The Writwell API description
+  version: '1.0'
+  contact: {}
+tags:
+  - name: writwell
+    description: ''
+servers: []
+components:
+  schemas:
+    WebsiteSummaryRequestDto:
+      type: object
+      properties: {}
+    KeywordRequestDto:
+      type: object
+      properties: {}

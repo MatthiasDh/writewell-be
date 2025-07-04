@@ -1,11 +1,22 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import OpenAI from 'openai';
 
-import { isDevelopment } from '../../utils/node.utils';
+import {
+  BUSINESS_RELEVANT_KEYWORDS_MOCKUP,
+  BUSINESS_SUMMARY_MOCKUP,
+} from '../mockup/business-summary.mockup';
+import {
+  BUSINESS_SUMMARY_PROMPT,
+  BUSINESS_RELEVANT_KEYWORDS_PROMPT,
+} from '../prompts/openai.prompt';
 
-type WebsiteSummary = {
+type BusinessSummary = {
   title: string;
   summary: string;
+};
+
+type BusinessRelevantKeywords = {
+  keywords: string[];
 };
 
 @Injectable()
@@ -18,18 +29,12 @@ export class OpenAIService {
     });
   }
 
-  async getSummaryFromText(textContent: string): Promise<WebsiteSummary> {
+  async getSummaryFromBusinessContext(
+    textContent: string,
+  ): Promise<BusinessSummary> {
     try {
-      if (isDevelopment) {
-        return {
-          title: 'Eco-Friendly Home Goods',
-          summary:
-            'This e-commerce platform specializes in sustainable home goods, offering a curated collection of eco-friendly products ranging from bamboo kitchenware to organic cotton bedding' +
-            'The website features a clean, minimalist design with intuitive navigation that makes it easy for environmentally conscious consumers to browse and purchase products.' +
-            'Customers can filter items by sustainability certifications, read detailed product descriptions highlighting eco-friendly materials,' +
-            'and access a comprehensive blog section with tips for living a more sustainable lifestyle. The platform also includes customer reviews, detailed shipping information, ' +
-            'and a rewards program that encourages repeat purchases while supporting environmental initiatives.',
-        };
+      if (process.env.NODE_ENV === 'development') {
+        return BUSINESS_SUMMARY_MOCKUP;
       }
 
       const completion = await this.openai.chat.completions.create({
@@ -37,17 +42,11 @@ export class OpenAIService {
         messages: [
           {
             role: 'system',
-            content:
-              'You are a helpful assistant that summarizes website content. Provide a concise, informative summary of the website content in 3-4 sentences.',
+            content: BUSINESS_SUMMARY_PROMPT,
           },
           {
             role: 'user',
-            content: `Please summarize the following website content: ${textContent}, also provide an appropriate title for the website,
-            this should be a short title that is not too long and precise. Return this in the following format:
-            {
-              "title": "title",
-              "summary": "summary"
-            }`,
+            content: `Please summarize the following website content: ${textContent}`,
           },
         ],
       });
@@ -55,16 +54,53 @@ export class OpenAIService {
       const response = JSON.parse(
         completion.choices[0]?.message?.content ||
           '{"title": "title", "summary": "summary"}',
-      ) as WebsiteSummary;
+      ) as BusinessSummary;
 
       return {
         title: response.title,
         summary: response.summary,
       };
-    } catch (error) {
-      console.error(error);
+    } catch {
       throw new HttpException(
-        'Failed to generate summary with OpenAI',
+        'Failed to generate summary',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getRelevantKeywordsFromBusinessContext(
+    context: string,
+  ): Promise<BusinessRelevantKeywords> {
+    try {
+      if (process.env.NODE_ENV === 'development') {
+        return BUSINESS_RELEVANT_KEYWORDS_MOCKUP;
+      }
+
+      const completion = await this.openai.chat.completions.create({
+        model: 'o4-mini-2025-04-16',
+        messages: [
+          {
+            role: 'system',
+            content: BUSINESS_RELEVANT_KEYWORDS_PROMPT,
+          },
+          {
+            role: 'user',
+            content: `Please summarize the following website content: ${context}`,
+          },
+        ],
+      });
+
+      const response = JSON.parse(
+        completion.choices[0]?.message?.content ||
+          '{"keywords": ["keyword1", "keyword2", "keyword3"]}',
+      ) as BusinessRelevantKeywords;
+
+      return {
+        keywords: response.keywords,
+      };
+    } catch {
+      throw new HttpException(
+        'Failed to generate keywords',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

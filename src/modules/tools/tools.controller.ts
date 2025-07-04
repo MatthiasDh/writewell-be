@@ -5,49 +5,106 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ToolsService } from './tools.service';
-import { WebsiteSummaryDTO } from './dto/website-summary.dto';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
+
+import {
+  BusinessRelevantKeywordsRequestDto,
+  BusinessRelevantKeywordsResponseDTO,
+  WebsiteSummaryRequestDto,
+  WebsiteSummaryResponseDTO,
+} from './dto/website-summary.dto';
 import { DataForSEOService } from '../../common/services/dataforseo.service';
-import { KeywordRequestDto } from './dto/keyword-request.dto';
+import { KeywordRequestDto, KeywordResponseDto } from './dto/keywords.dto';
+import { PuppeteerService } from '../../common/services/puppeteer.service';
+import { OpenAIService } from '../../common/services/openai.service';
 
-export class ScanUrlDto {
-  url: string;
-}
-
+@ApiTags('tools')
 @Controller('tools')
 export class ToolsController {
   constructor(
-    private readonly toolsService: ToolsService,
+    private readonly puppeteerService: PuppeteerService,
     private readonly dataForSEOService: DataForSEOService,
+    private readonly openaiService: OpenAIService,
   ) {}
 
-  @Post('site-summary')
-  async getSiteSummary(
-    @Body() scanUrlDto: ScanUrlDto,
-  ): Promise<WebsiteSummaryDTO> {
+  @Post('business-summary')
+  @ApiResponse({
+    status: 200,
+    type: WebsiteSummaryResponseDTO,
+  })
+  @ApiResponse({
+    status: 500,
+  })
+  async getBusinessSummary(
+    @Body() websiteSummaryRequest: WebsiteSummaryRequestDto,
+  ): Promise<WebsiteSummaryResponseDTO> {
     try {
-      const summary = await this.toolsService.scanUrl(scanUrlDto.url);
+      const summary = await this.puppeteerService.scanUrl(
+        websiteSummaryRequest.url,
+      );
 
-      return { title: summary.title, summary: summary.summary };
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to scan URL';
-      throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+      return {
+        title: summary.title,
+        summary: summary.summary,
+      };
+    } catch {
+      throw new HttpException(
+        'Failed to scan URL',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
-  @Post('keywords')
-  async getKeywords(@Body() keywordRequestDto: KeywordRequestDto) {
+  @Post('business-keywords')
+  @ApiResponse({
+    status: 200,
+    type: BusinessRelevantKeywordsResponseDTO,
+  })
+  @ApiResponse({
+    status: 500,
+  })
+  async getBusinessKeywords(
+    @Body() businessRelevantKeywordsRequest: BusinessRelevantKeywordsRequestDto,
+  ): Promise<BusinessRelevantKeywordsResponseDTO> {
     try {
-      const keywords = await this.dataForSEOService.getRelevantKeywords(
-        keywordRequestDto.text,
+      const summary =
+        await this.openaiService.getRelevantKeywordsFromBusinessContext(
+          businessRelevantKeywordsRequest.context,
+        );
+
+      return {
+        keywords: summary.keywords,
+      };
+    } catch {
+      throw new HttpException(
+        'Failed to scan URL',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('keyword-insights')
+  @ApiResponse({
+    status: 200,
+    type: KeywordResponseDto,
+  })
+  @ApiResponse({
+    status: 500,
+  })
+  async getKeywordsInsights(
+    @Body() keywordRequestDto: KeywordRequestDto,
+  ): Promise<KeywordResponseDto> {
+    try {
+      const keywords = await this.dataForSEOService.getKeywordsInsights(
+        keywordRequestDto.keywords,
       );
 
-      return keywords;
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : 'Failed to fetch keywords';
-      throw new HttpException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+      return { keywords };
+    } catch {
+      throw new HttpException(
+        'Failed to fetch keywords',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

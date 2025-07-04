@@ -1,18 +1,18 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { isValidUrl } from '../helpers/url.helper';
+import { WebsiteSummaryResponseDTO } from '../../modules/tools/dto/website-summary.dto';
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { OpenAIService } from '../../common/services/openai.service';
-import { WebsiteSummaryDTO } from './dto/website-summary.dto';
+import { OpenAIService } from './openai.service';
 
 @Injectable()
-export class ToolsService {
+export class PuppeteerService {
   constructor(private readonly openaiService: OpenAIService) {}
 
-  async scanUrl(url: string): Promise<WebsiteSummaryDTO> {
+  async scanUrl(url: string): Promise<WebsiteSummaryResponseDTO> {
     let browser: Browser | undefined;
 
     try {
-      // Validate URL
-      if (!url || !this.isValidUrl(url)) {
+      if (!url || !isValidUrl(url)) {
         throw new HttpException('Invalid URL provided', HttpStatus.BAD_REQUEST);
       }
 
@@ -56,8 +56,8 @@ export class ToolsService {
       const textContent = this.extractTextFromHtml(htmlContent);
 
       // Process with OpenAI
-      const summary: WebsiteSummaryDTO =
-        await this.openaiService.getSummaryFromText(textContent);
+      const summary =
+        await this.openaiService.getSummaryFromBusinessContext(textContent);
 
       return summary;
     } catch (error: unknown) {
@@ -84,15 +84,6 @@ export class ToolsService {
       if (browser) {
         await browser.close();
       }
-    }
-  }
-
-  private isValidUrl(url: string): boolean {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
     }
   }
 
