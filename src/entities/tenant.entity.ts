@@ -33,8 +33,8 @@ export class Tenant {
 
   @ManyToMany(() => User, (user) => user.tenants)
   @JoinTable({
-    name: 'account_users',
-    joinColumn: { name: 'account_id', referencedColumnName: 'id' },
+    name: 'tenant_users',
+    joinColumn: { name: 'tenant_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   users: User[];

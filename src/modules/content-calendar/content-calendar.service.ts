@@ -1,6 +1,6 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { ContentCalendar } from '../../entities/content-calendar.entity';
 import { Tenant } from '../../entities/tenant.entity';
 import { UpdateContentCalendarDto } from './dto/update-content-calendar.dto';
@@ -17,8 +17,9 @@ export class ContentCalendarService {
     private readonly contentItemRepository: Repository<ContentItem>,
   ) {}
 
-  async findAll(): Promise<ContentCalendar[]> {
+  async findAll(tenantId: string): Promise<ContentCalendar[]> {
     return this.contentCalendarRepository.find({
+      where: { tenant: { id: tenantId } },
       relations: ['tenant', 'contentItems'],
     });
   }
@@ -82,5 +83,26 @@ export class ContentCalendarService {
     const createdItems = this.contentItemRepository.create(contentItems);
 
     return this.contentItemRepository.save(createdItems);
+  }
+
+  async findContentItemsByDateRange(tenantId: string): Promise<ContentItem[]> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+
+    const endDate = new Date(today);
+    endDate.setDate(today.getDate() + 30); // 30 days from today
+
+    return this.contentItemRepository.find({
+      where: {
+        contentCalendar: {
+          tenant: { id: tenantId },
+        },
+        publishDate: Between(today, endDate),
+      },
+      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      order: {
+        publishDate: 'ASC',
+      },
+    });
   }
 }

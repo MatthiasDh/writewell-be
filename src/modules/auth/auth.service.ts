@@ -30,9 +30,8 @@ export class AuthService {
       relevantKeywords: [],
     });
 
-    await this.usersService.update(user.id, {
-      tenants: [tenant.id],
-    });
+    // Add the user to the tenant using the proper method
+    await this.usersService.addAccountToUser(user.id, tenant.id);
 
     const tokens = await this.getTokens(user.id, user.email, tenant.id);
     await this.storeRefreshToken(user.id, tokens.refresh_token);

@@ -28,7 +28,6 @@ import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { TenantResponseDto } from './dto/tenant-response.dto';
 import { PuppeteerService } from '../../common/services/puppeteer.service';
-import { AuthService } from '../auth/auth.service';
 import { JWTUser } from '../../types/auth.type';
 import { CurrentUserInterceptor } from '../../interceptors/current-user.interceptor';
 import { TenantSummaryRequestDto } from './dto/generate-summary-request.dto';
@@ -72,8 +71,8 @@ export class TenantsController {
     description: 'List of tenants retrieved successfully',
     type: [TenantResponseDto],
   })
-  async findAll() {
-    return this.tenantsService.findAll();
+  async findAll(@CurrentUser() user: JWTUser) {
+    return this.tenantsService.findAll(user.sub);
   }
 
   @Get(':id')

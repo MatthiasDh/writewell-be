@@ -52,18 +52,18 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.userRepository.find({
-      relations: ['accounts'],
+      relations: ['tenants'],
     });
   }
 
   async findOne(id: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['accounts'],
+      relations: ['tenants'],
     });
 
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new Error();
     }
 
     return user;
@@ -72,14 +72,19 @@ export class UsersService {
   async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { email },
-      relations: ['accounts'],
+      relations: ['tenants'],
       select: {
+        id: true,
+        email: true,
         password: true,
+        refreshToken: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
 
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new Error();
     }
 
     return user;
@@ -104,22 +109,22 @@ export class UsersService {
     const user = await this.findOne(userId);
     const tenant = await this.tenantRepository.findOne({
       where: { id: accountId },
+      relations: ['users'],
     });
 
     if (!tenant) {
       throw new HttpException('Tenant not found', HttpStatus.NOT_FOUND);
     }
 
-    if (!user.tenants) {
-      user.tenants = [];
+    if (!tenant.users) {
+      tenant.users = [];
     }
 
-    const isAlreadyAssociated = user.tenants.some(
-      (tenant) => tenant.id === accountId,
-    );
+    const isAlreadyAssociated = tenant.users.some((user) => user.id === userId);
+
     if (!isAlreadyAssociated) {
-      user.tenants.push(tenant);
-      await this.userRepository.save(user);
+      tenant.users.push(user);
+      await this.tenantRepository.save(tenant);
     }
 
     return this.findOne(userId);
@@ -129,11 +134,18 @@ export class UsersService {
     userId: string,
     accountId: string,
   ): Promise<User> {
-    const user = await this.findOne(userId);
+    const tenant = await this.tenantRepository.findOne({
+      where: { id: accountId },
+      relations: ['users'],
+    });
 
-    if (user.tenants) {
-      user.tenants = user.tenants.filter((tenant) => tenant.id !== accountId);
-      await this.userRepository.save(user);
+    if (!tenant) {
+      throw new HttpException('Tenant not found', HttpStatus.NOT_FOUND);
+    }
+
+    if (tenant.users) {
+      tenant.users = tenant.users.filter((user) => user.id !== userId);
+      await this.tenantRepository.save(tenant);
     }
 
     return this.findOne(userId);

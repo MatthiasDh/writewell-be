@@ -10,4 +10,12 @@ export class UpdateTenantDto extends PartialType(CreateTenantDto) {
   @IsArray()
   @IsOptional()
   keywords?: string[];
+
+  @ApiProperty({
+    description: 'Tenant users',
+    example: ['user1', 'user2', 'user3'],
+  })
+  @IsArray()
+  @IsOptional()
+  users?: string[];
 }

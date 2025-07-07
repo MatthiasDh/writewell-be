@@ -38,9 +38,14 @@ export class TenantsService {
     }
   }
 
-  async findAll(): Promise<Tenant[]> {
+  async findAll(userId: string): Promise<Tenant[]> {
     return this.tenantRepository.find({
-      relations: ['users', 'contentCalendar'],
+      where: {
+        users: {
+          id: userId,
+        },
+      },
+      relations: ['users'],
     });
   }
 

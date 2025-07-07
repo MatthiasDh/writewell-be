@@ -34,7 +34,7 @@ import { TenantsService } from '../tenants/tenants.service';
 import { CurrentUser } from '../../decorators/current-user.decorator';
 
 @ApiTags('content-calendars')
-@Controller('content-calendars')
+@Controller('tenant/content-calendar')
 @UseInterceptors(CurrentUserInterceptor)
 export class ContentCalendarController {
   constructor(
@@ -45,14 +45,14 @@ export class ContentCalendarController {
 
   @Get()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all content calendars' })
+  @ApiOperation({ summary: 'Get content-calendar for tenant' })
   @ApiResponse({
     status: 200,
-    description: 'List of content calendars retrieved successfully',
+    description: 'Content-calendar retrieved successfully',
     type: [ContentCalendarResponseDto],
   })
-  async findAll() {
-    return this.contentCalendarService.findAll();
+  async findAll(@CurrentUser() { tenantId }: JWTUser) {
+    return this.contentCalendarService.findAll(tenantId);
   }
 
   @Get(':id')
@@ -132,7 +132,35 @@ export class ContentCalendarController {
     await this.contentCalendarService.remove(id);
   }
 
-  @Post('generate-blog-content-items')
+  @Get('upcoming')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get content items with publish dates from today to 30 days ahead',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Content items retrieved successfully',
+    type: 'array',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          id: { type: 'string' },
+          type: { type: 'string' },
+          title: { type: 'string' },
+          content: { type: 'string' },
+          publishDate: { type: 'string', format: 'date-time' },
+          isPublished: { type: 'boolean' },
+        },
+      },
+    },
+  })
+  async getUpcomingContentItems(@CurrentUser() { tenantId }: JWTUser) {
+    return this.contentCalendarService.findContentItemsByDateRange(tenantId);
+  }
+
+  @Post('generate')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Generate content for a content calendar' })
   @ApiParam({ name: 'id', description: 'Content calendar ID', type: 'string' })
@@ -148,24 +176,54 @@ export class ContentCalendarController {
       throw new BadRequestException('User has no tenant');
     }
 
-    // Call OpenAI with keywords and generate blog topics
-    const blogTopics =
-      await this.openaiService.getBlogTopicsFromKeywords(keywords);
+    const existingContentItems =
+      await this.contentCalendarService.findContentItemsByDateRange(
+        user.tenantId,
+      );
 
-    // Get tenant for user
-    const tenant = await this.tenantsService.findOne(user.tenantId);
+    // If there are fewer than 23 content items in the next 30 days, generate more
+    const itemsToGenerate = 30 - existingContentItems.length;
+    if (itemsToGenerate >= 7) {
+      console.log(`Generating ${itemsToGenerate} more content items`);
 
-    // Generate content items of type blog for each topic
-    const blogContentItems = blogTopics.map((topic) => ({
-      type: ContentType.BLOG,
-      title: topic,
-      content: '',
-      publishDate: new Date(),
-      isPublished: false,
-      contentCalendar: tenant.contentCalendar,
-    }));
+      // Calculate the starting date for new content items
+      let startDate = new Date();
+      if (existingContentItems.length > 0) {
+        // Find the latest publish date and add 1 day
+        const latestItem =
+          existingContentItems[existingContentItems.length - 1];
+        startDate = new Date(latestItem.publishDate);
+        startDate.setDate(startDate.getDate() + 1);
+      }
 
-    await this.contentCalendarService.createContentItems(blogContentItems);
+      const blogTopics = await this.openaiService.getBlogTopicsFromKeywords(
+        keywords,
+        itemsToGenerate,
+      );
+
+      // Get tenant for user
+      const tenant = await this.tenantsService.findOne(user.tenantId);
+
+      if (!tenant.contentCalendar) {
+        throw new BadRequestException(
+          'Tenant does not have a content calendar',
+        );
+      }
+
+      const blogContentItems = blogTopics.map((topic, index) => ({
+        type: ContentType.BLOG,
+        title: topic,
+        content: '',
+        publishDate: new Date(
+          startDate.getTime() + index * 24 * 60 * 60 * 1000,
+        ),
+        isPublished: false,
+        contentCalendar: tenant.contentCalendar,
+      }));
+
+      console.log(`Creating ${blogContentItems.length} content items`);
+      await this.contentCalendarService.createContentItems(blogContentItems);
+    }
 
     return null;
   }
