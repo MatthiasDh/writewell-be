@@ -55,6 +55,12 @@ The application will automatically create the following tables when started:
 
 ## API Endpoints
 
+### Authentication
+
+- `POST /api/auth/login` - User login
+- `POST /api/auth/signUp` - User registration
+- `GET /api/auth/refresh/:refreshToken` - Refresh access token
+
 ### Users
 
 - `POST /api/users` - Create user

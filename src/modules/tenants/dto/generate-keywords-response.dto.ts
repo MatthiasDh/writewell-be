@@ -1,10 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class KeywordRequestDto {
-  @ApiProperty()
-  keywords: string[];
-}
-
 export class KeywordItemDto {
   @ApiProperty({
     description: 'The keyword',
@@ -50,9 +45,7 @@ export class KeywordItemDto {
   high_top_of_page_bid: number;
 }
 
-export class KeywordResponseDto {
-  @ApiProperty({
-    type: [KeywordItemDto],
-  })
+export class BusinessRelevantKeywordsResponseDTO {
+  @ApiProperty()
   keywords: KeywordItemDto[];
 }

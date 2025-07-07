@@ -21,3 +21,15 @@ export const BUSINESS_RELEVANT_KEYWORDS_PROMPT = `
         "keywords": ["keyword1", "keyword2", "keyword3"]
     }
 `;
+
+export const BLOG_TOPICS_PROMPT = `
+    You are a marketing expert.
+    You are given a list of keywords and you need to generate a list of blog topics that are relevant to the business that the website is about.
+    You need to provide a list of 15 blog topics.
+    They need to be fit for SEO and be relevant to the business that the website is about.
+
+    Output format:
+    {
+        "blogTopics": ["blogTopic1", "blogTopic2", "blogTopic3"]
+    }
+`;

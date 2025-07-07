@@ -8,6 +8,7 @@ import {
 import {
   BUSINESS_SUMMARY_PROMPT,
   BUSINESS_RELEVANT_KEYWORDS_PROMPT,
+  BLOG_TOPICS_PROMPT,
 } from '../prompts/openai.prompt';
 
 type BusinessSummary = {
@@ -101,6 +102,40 @@ export class OpenAIService {
     } catch {
       throw new HttpException(
         'Failed to generate keywords',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async getBlogTopicsFromKeywords(keywords: string[]): Promise<string[]> {
+    try {
+      if (process.env.NODE_ENV === 'development') {
+        return ['Some topics', 'Some other topics'];
+      }
+
+      const completion = await this.openai.chat.completions.create({
+        model: 'o4-mini-2025-04-16',
+        messages: [
+          {
+            role: 'system',
+            content: BLOG_TOPICS_PROMPT,
+          },
+          {
+            role: 'user',
+            content: `Please generate a list of blog topics based on the following keywords: ${keywords.join(', ')}`,
+          },
+        ],
+      });
+
+      const response = JSON.parse(
+        completion.choices[0]?.message?.content ||
+          '{"blogTopics": ["blogTopic1", "blogTopic2", "blogTopic3"]}',
+      ) as { blogTopics: string[] };
+
+      return response.blogTopics;
+    } catch {
+      throw new HttpException(
+        'Failed to generate blog topics',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

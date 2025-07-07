@@ -1,38 +1,38 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class AccountResponseDto {
+export class TenantResponseDto {
   @ApiProperty({
-    description: 'Account ID',
+    description: 'Tenant ID',
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   id: string;
 
   @ApiProperty({
-    description: 'Account title',
+    description: 'Tenant title',
     example: 'My Company',
   })
   title: string;
 
   @ApiProperty({
-    description: 'Account description',
+    description: 'Tenant description',
     example: 'A leading technology company',
   })
   description: string;
 
   @ApiProperty({
-    description: 'Relevant keywords for the account',
+    description: 'Relevant keywords for the tenant',
     example: ['technology', 'software', 'innovation'],
   })
   relevantKeywords: string[];
 
   @ApiProperty({
-    description: 'Account creation date',
+    description: 'Tenant creation date',
     example: '2023-01-01T00:00:00.000Z',
   })
   createdAt: Date;
 
   @ApiProperty({
-    description: 'Account last update date',
+    description: 'Tenant last update date',
     example: '2023-01-01T00:00:00.000Z',
   })
   updatedAt: Date;

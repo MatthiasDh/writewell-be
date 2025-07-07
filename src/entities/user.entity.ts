@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Account } from './account.entity';
+import { Tenant } from './tenant.entity';
 
 @Entity('users')
 export class User {
@@ -16,17 +16,11 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  firstName: string;
-
-  @Column()
-  lastName: string;
-
   @Column({ select: false })
   password: string;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column({ nullable: true })
+  refreshToken: string;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -34,6 +28,6 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => Account, (account) => account.users)
-  accounts: Account[];
+  @ManyToMany(() => Tenant, (tenant) => tenant.users)
+  tenants: Tenant[];
 }

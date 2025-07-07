@@ -11,8 +11,8 @@ import {
 import { User } from './user.entity';
 import { ContentCalendar } from './content-calendar.entity';
 
-@Entity('accounts')
-export class Account {
+@Entity('tenants')
+export class Tenant {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -31,7 +31,7 @@ export class Account {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany(() => User, (user) => user.accounts)
+  @ManyToMany(() => User, (user) => user.tenants)
   @JoinTable({
     name: 'account_users',
     joinColumn: { name: 'account_id', referencedColumnName: 'id' },
@@ -39,7 +39,7 @@ export class Account {
   })
   users: User[];
 
-  @OneToOne(() => ContentCalendar, (calendar) => calendar.account, {
+  @OneToOne(() => ContentCalendar, (calendar) => calendar.tenant, {
     cascade: true,
   })
   contentCalendar: ContentCalendar;

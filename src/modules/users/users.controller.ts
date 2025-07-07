@@ -19,10 +19,9 @@ import {
   ApiBody,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-  ApiConflictResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 
@@ -31,32 +30,8 @@ import { UserResponseDto } from './dto/user-response.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({
-    status: 201,
-    description: 'User created successfully',
-    type: UserResponseDto,
-  })
-  @ApiConflictResponse({ description: 'User with this email already exists' })
-  @ApiBadRequestResponse({ description: 'Invalid input data' })
-  @ApiBody({ type: CreateUserDto })
-  async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({
-    status: 200,
-    description: 'List of users retrieved successfully',
-    type: [UserResponseDto],
-  })
-  async findAll() {
-    return this.usersService.findAll();
-  }
-
   @Get(':id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiParam({ name: 'id', description: 'User ID', type: 'string' })
   @ApiResponse({
@@ -70,6 +45,7 @@ export class UsersController {
   }
 
   @Get('email/:email')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get a user by email' })
   @ApiParam({ name: 'email', description: 'User email', type: 'string' })
   @ApiResponse({
@@ -83,6 +59,7 @@ export class UsersController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a user' })
   @ApiParam({ name: 'id', description: 'User ID', type: 'string' })
   @ApiResponse({
@@ -101,6 +78,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a user' })
   @ApiParam({ name: 'id', description: 'User ID', type: 'string' })
@@ -114,6 +92,7 @@ export class UsersController {
   }
 
   @Post(':userId/accounts/:accountId')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Add account to user' })
   @ApiParam({ name: 'userId', description: 'User ID', type: 'string' })
   @ApiParam({ name: 'accountId', description: 'Account ID', type: 'string' })
@@ -131,6 +110,7 @@ export class UsersController {
   }
 
   @Delete(':userId/accounts/:accountId')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Remove account from user' })
   @ApiParam({ name: 'userId', description: 'User ID', type: 'string' })
   @ApiParam({ name: 'accountId', description: 'Account ID', type: 'string' })

@@ -21,6 +21,7 @@ import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ContentItemsService } from './content-items.service';
 import { CreateContentItemDto } from './dto/create-content-item.dto';
@@ -34,6 +35,7 @@ export class ContentItemsController {
   constructor(private readonly contentItemsService: ContentItemsService) {}
 
   @Post()
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new content item' })
   @ApiResponse({
     status: 201,
@@ -50,6 +52,7 @@ export class ContentItemsController {
   }
 
   @Get()
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all content items' })
   @ApiQuery({
     name: 'type',
@@ -85,6 +88,7 @@ export class ContentItemsController {
   }
 
   @Get(':id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get a content item by ID' })
   @ApiParam({ name: 'id', description: 'Content item ID', type: 'string' })
   @ApiResponse({
@@ -98,6 +102,7 @@ export class ContentItemsController {
   }
 
   @Get('calendar/:calendarId')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get content items by calendar ID' })
   @ApiParam({
     name: 'calendarId',
@@ -114,6 +119,7 @@ export class ContentItemsController {
   }
 
   @Get('account/:accountId')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get content items by account ID' })
   @ApiParam({ name: 'accountId', description: 'Account ID', type: 'string' })
   @ApiResponse({
@@ -126,6 +132,7 @@ export class ContentItemsController {
   }
 
   @Get('user/:userId')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get content items by user ID' })
   @ApiParam({ name: 'userId', description: 'User ID', type: 'string' })
   @ApiResponse({
@@ -138,6 +145,7 @@ export class ContentItemsController {
   }
 
   @Get('date-range')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get content items by date range' })
   @ApiQuery({
     name: 'startDate',
@@ -168,6 +176,7 @@ export class ContentItemsController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a content item' })
   @ApiParam({ name: 'id', description: 'Content item ID', type: 'string' })
   @ApiResponse({
@@ -186,6 +195,7 @@ export class ContentItemsController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a content item' })
   @ApiParam({ name: 'id', description: 'Content item ID', type: 'string' })
@@ -199,6 +209,7 @@ export class ContentItemsController {
   }
 
   @Post(':id/publish')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Publish a content item' })
   @ApiParam({ name: 'id', description: 'Content item ID', type: 'string' })
   @ApiResponse({
@@ -212,6 +223,7 @@ export class ContentItemsController {
   }
 
   @Post(':id/unpublish')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Unpublish a content item' })
   @ApiParam({ name: 'id', description: 'Content item ID', type: 'string' })
   @ApiResponse({

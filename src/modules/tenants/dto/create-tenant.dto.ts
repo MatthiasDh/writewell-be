@@ -1,9 +1,19 @@
 import { IsString, IsNotEmpty, IsArray, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateAccountDto {
+export class CreateTenantDto {
   @ApiProperty({
-    description: 'Account title',
+    description: 'Tenant domain',
+    example: 'mycompany.com',
+    required: true,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @IsOptional()
+  domain?: string;
+
+  @ApiProperty({
+    description: 'Tenant title',
     example: 'My Company',
   })
   @IsString()
@@ -11,7 +21,7 @@ export class CreateAccountDto {
   title: string;
 
   @ApiProperty({
-    description: 'Account description',
+    description: 'Tenant description',
     example: 'A leading technology company',
   })
   @IsString()
@@ -19,7 +29,7 @@ export class CreateAccountDto {
   description: string;
 
   @ApiProperty({
-    description: 'Relevant keywords for the account',
+    description: 'Relevant keywords for the tenant',
     example: ['technology', 'software', 'innovation'],
     required: false,
   })
