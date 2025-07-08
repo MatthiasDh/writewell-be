@@ -26,7 +26,7 @@ export class ContentCalendarService {
 
   async findOne(id: string): Promise<ContentCalendar> {
     const contentCalendar = await this.contentCalendarRepository.findOne({
-      where: { id },
+      where: { tenant: { id } },
       relations: ['tenant', 'contentItems'],
     });
 

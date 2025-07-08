@@ -4,11 +4,8 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   ValidationPipe,
   ParseUUIDPipe,
-  HttpCode,
-  HttpStatus,
   Post,
   UseInterceptors,
   BadRequestException,
@@ -43,62 +40,6 @@ export class ContentCalendarController {
     private readonly tenantsService: TenantsService,
   ) {}
 
-  @Get()
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get content-calendar for tenant' })
-  @ApiResponse({
-    status: 200,
-    description: 'Content-calendar retrieved successfully',
-    type: [ContentCalendarResponseDto],
-  })
-  async findAll(@CurrentUser() { tenantId }: JWTUser) {
-    return this.contentCalendarService.findAll(tenantId);
-  }
-
-  @Get(':id')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get a content calendar by ID' })
-  @ApiParam({ name: 'id', description: 'Content calendar ID', type: 'string' })
-  @ApiResponse({
-    status: 200,
-    description: 'Content calendar retrieved successfully',
-    type: ContentCalendarResponseDto,
-  })
-  @ApiNotFoundResponse({ description: 'Content calendar not found' })
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.contentCalendarService.findOne(id);
-  }
-
-  @Get('account/:accountId')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get content calendar by account ID' })
-  @ApiParam({ name: 'accountId', description: 'Account ID', type: 'string' })
-  @ApiResponse({
-    status: 200,
-    description: 'Content calendar retrieved successfully',
-    type: ContentCalendarResponseDto,
-  })
-  @ApiResponse({
-    status: 204,
-    description: 'No content calendar found for this account',
-  })
-  async findByAccount(@Param('accountId', ParseUUIDPipe) accountId: string) {
-    return this.contentCalendarService.findByAccount(accountId);
-  }
-
-  @Get('user/:userId')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get content calendars by user ID' })
-  @ApiParam({ name: 'userId', description: 'User ID', type: 'string' })
-  @ApiResponse({
-    status: 200,
-    description: 'Content calendars retrieved successfully',
-    type: [ContentCalendarResponseDto],
-  })
-  async findByUser(@Param('userId', ParseUUIDPipe) userId: string) {
-    return this.contentCalendarService.findByUser(userId);
-  }
-
   @Patch(':id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a content calendar' })
@@ -118,46 +59,26 @@ export class ContentCalendarController {
     return this.contentCalendarService.update(id, updateContentCalendarDto);
   }
 
-  @Delete(':id')
-  @ApiBearerAuth()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete a content calendar' })
-  @ApiParam({ name: 'id', description: 'Content calendar ID', type: 'string' })
-  @ApiResponse({
-    status: 204,
-    description: 'Content calendar deleted successfully',
-  })
-  @ApiNotFoundResponse({ description: 'Content calendar not found' })
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
-    await this.contentCalendarService.remove(id);
-  }
-
-  @Get('upcoming')
+  @Get()
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Get content items with publish dates from today to 30 days ahead',
+    summary: 'Get content calendar with upcoming content items',
   })
   @ApiResponse({
     status: 200,
-    description: 'Content items retrieved successfully',
-    type: 'array',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          id: { type: 'string' },
-          type: { type: 'string' },
-          title: { type: 'string' },
-          content: { type: 'string' },
-          publishDate: { type: 'string', format: 'date-time' },
-          isPublished: { type: 'boolean' },
-        },
-      },
-    },
+    description: 'Content calendar with content items retrieved successfully',
+    type: ContentCalendarResponseDto,
   })
   async getUpcomingContentItems(@CurrentUser() { tenantId }: JWTUser) {
-    return this.contentCalendarService.findContentItemsByDateRange(tenantId);
+    const contentItems =
+      await this.contentCalendarService.findContentItemsByDateRange(tenantId);
+    console.log(contentItems);
+    const contentCalendar = await this.contentCalendarService.findOne(tenantId);
+
+    return {
+      ...contentCalendar,
+      contentItems,
+    };
   }
 
   @Post('generate')
@@ -183,6 +104,7 @@ export class ContentCalendarController {
 
     // If there are fewer than 23 content items in the next 30 days, generate more
     const itemsToGenerate = 30 - existingContentItems.length;
+
     if (itemsToGenerate >= 7) {
       console.log(`Generating ${itemsToGenerate} more content items`);
 

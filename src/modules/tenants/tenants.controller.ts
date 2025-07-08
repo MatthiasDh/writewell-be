@@ -240,8 +240,8 @@ export class TenantsController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Summary generated successfully',
-    type: String,
+    description: 'Keywords generated successfully',
+    type: BusinessRelevantKeywordsResponseDTO,
   })
   async generateKeywords(
     @CurrentUser() user: JWTUser,

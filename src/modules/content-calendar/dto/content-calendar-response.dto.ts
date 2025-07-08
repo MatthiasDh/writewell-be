@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ContentItemResponseDto } from '../../content-items/dto/content-item-response.dto';
 
 export class ContentCalendarResponseDto {
   @ApiProperty({
@@ -15,9 +16,10 @@ export class ContentCalendarResponseDto {
 
   @ApiProperty({
     description: 'Content calendar description',
-    example: 'Marketing content calendar for Q1 2024',
+    example: 'Marketing content calendar for the first quarter of 2024',
+    nullable: true,
   })
-  description: string;
+  description: string | null;
 
   @ApiProperty({
     description: 'Content calendar creation date',
@@ -30,4 +32,10 @@ export class ContentCalendarResponseDto {
     example: '2023-01-01T00:00:00.000Z',
   })
   updatedAt: Date;
+
+  @ApiProperty({
+    description: 'Array of content items belonging to this calendar',
+    type: [ContentItemResponseDto],
+  })
+  contentItems: ContentItemResponseDto[];
 }
