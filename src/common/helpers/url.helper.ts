@@ -7,3 +7,7 @@ export const isValidUrl = (url: string): boolean => {
     return false;
   }
 };
+
+export const sanitizeUrl = (url: string) => {
+  return url.replace(/^https?:\/\//, '').replace(/\.[^.]*$/, '');
+};

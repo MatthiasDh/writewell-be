@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { isValidUrl } from '../helpers/url.helper';
-import { TenantSummaryResponseDto } from '../../modules/tenants/dto/generate-summary-response.dto';
+import { OrganizationSummaryResponseDto } from '../../modules/organizations/dto/generate-summary-response.dto';
 import puppeteer, { Browser, Page } from 'puppeteer';
 import { OpenAIService } from './openai.service';
 
@@ -8,7 +8,7 @@ import { OpenAIService } from './openai.service';
 export class PuppeteerService {
   constructor(private readonly openaiService: OpenAIService) {}
 
-  async scanUrl(url: string): Promise<TenantSummaryResponseDto> {
+  async scanUrl(url: string): Promise<OrganizationSummaryResponseDto> {
     let browser: Browser | undefined;
 
     try {

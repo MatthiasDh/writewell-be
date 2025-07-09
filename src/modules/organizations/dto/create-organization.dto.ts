@@ -1,9 +1,9 @@
 import { IsString, IsNotEmpty, IsArray, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateTenantDto {
+export class CreateOrganizationDto {
   @ApiProperty({
-    description: 'Tenant domain',
+    description: 'Organization domain',
     example: 'mycompany.com',
     required: true,
   })
@@ -13,7 +13,7 @@ export class CreateTenantDto {
   domain?: string;
 
   @ApiProperty({
-    description: 'Tenant title',
+    description: 'Organization title',
     example: 'My Company',
   })
   @IsString()
@@ -21,7 +21,7 @@ export class CreateTenantDto {
   title: string;
 
   @ApiProperty({
-    description: 'Tenant description',
+    description: 'Organization description',
     example: 'A leading technology company',
   })
   @IsString()
@@ -29,7 +29,7 @@ export class CreateTenantDto {
   description: string;
 
   @ApiProperty({
-    description: 'Relevant keywords for the tenant',
+    description: 'Relevant keywords for the organization',
     example: ['technology', 'software', 'innovation'],
     required: false,
   })

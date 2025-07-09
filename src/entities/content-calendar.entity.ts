@@ -8,8 +8,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Tenant } from './tenant.entity';
 import { ContentItem } from './content-item.entity';
+import { Organization } from '@clerk/backend';
 
 @Entity('content_calendars')
 export class ContentCalendar {
@@ -28,9 +28,8 @@ export class ContentCalendar {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToOne(() => Tenant, (tenant) => tenant.contentCalendar)
-  @JoinColumn({ name: 'tenant_id' })
-  tenant: Tenant;
+  @Column({ type: 'uuid' })
+  organizationId: string;
 
   @OneToMany(() => ContentItem, (contentItem) => contentItem.contentCalendar)
   contentItems: ContentItem[];

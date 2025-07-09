@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class TenantSummaryResponseDto {
+export class OrganizationSummaryResponseDto {
   @ApiProperty({ description: 'Updated business title' })
   title: string;
 

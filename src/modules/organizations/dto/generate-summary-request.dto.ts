@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class TenantSummaryRequestDto {
+export class OrganizationSummaryRequestDto {
   @ApiProperty({
     description: 'Website URL to analyze',
   })

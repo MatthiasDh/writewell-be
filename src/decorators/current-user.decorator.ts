@@ -1,17 +1,9 @@
-import { ExecutionContext } from '@nestjs/common';
-
-import { createParamDecorator } from '@nestjs/common';
-import { JWTUser } from '../types/auth.type';
-import { Request } from 'express';
-
-type AuthenticatedRequest = Request & {
-  currentUser?: JWTUser;
-};
+import { createParamDecorator, type ExecutionContext } from '@nestjs/common';
 
 export const CurrentUser = createParamDecorator(
-  (data: unknown, context: ExecutionContext): JWTUser | undefined => {
-    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
+  (data: never, context: ExecutionContext) => {
+    const request = context.switchToHttp().getRequest();
 
-    return request.currentUser;
+    return request.user;
   },
 );

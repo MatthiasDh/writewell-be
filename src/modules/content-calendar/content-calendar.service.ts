@@ -2,7 +2,6 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
 import { ContentCalendar } from '../../entities/content-calendar.entity';
-import { Tenant } from '../../entities/tenant.entity';
 import { UpdateContentCalendarDto } from './dto/update-content-calendar.dto';
 import { ContentItem } from '../../entities/content-item.entity';
 
@@ -11,23 +10,21 @@ export class ContentCalendarService {
   constructor(
     @InjectRepository(ContentCalendar)
     private readonly contentCalendarRepository: Repository<ContentCalendar>,
-    @InjectRepository(Tenant)
-    private readonly tenantRepository: Repository<Tenant>,
     @InjectRepository(ContentItem)
     private readonly contentItemRepository: Repository<ContentItem>,
   ) {}
 
-  async findAll(tenantId: string): Promise<ContentCalendar[]> {
+  async findAll(organizationId: string): Promise<ContentCalendar[]> {
     return this.contentCalendarRepository.find({
-      where: { tenant: { id: tenantId } },
-      relations: ['tenant', 'contentItems'],
+      where: { organization: { id: organizationId } },
+      relations: ['organization', 'contentItems'],
     });
   }
 
   async findOne(id: string): Promise<ContentCalendar> {
     const contentCalendar = await this.contentCalendarRepository.findOne({
-      where: { tenant: { id } },
-      relations: ['tenant', 'contentItems'],
+      where: { organization: { id } },
+      relations: ['organization', 'contentItems'],
     });
 
     if (!contentCalendar) {
@@ -42,8 +39,8 @@ export class ContentCalendarService {
 
   async findByAccount(accountId: string): Promise<ContentCalendar | null> {
     return this.contentCalendarRepository.findOne({
-      where: { tenant: { id: accountId } },
-      relations: ['tenant', 'contentItems'],
+      where: { organization: { id: accountId } },
+      relations: ['organization', 'contentItems'],
     });
   }
 
@@ -67,13 +64,13 @@ export class ContentCalendarService {
   async findByUser(userId: string): Promise<ContentCalendar[]> {
     return this.contentCalendarRepository.find({
       where: {
-        tenant: {
+        organization: {
           users: {
             id: userId,
           },
         },
       },
-      relations: ['tenant', 'contentItems'],
+      relations: ['organization', 'contentItems'],
     });
   }
 
@@ -85,7 +82,9 @@ export class ContentCalendarService {
     return this.contentItemRepository.save(createdItems);
   }
 
-  async findContentItemsByDateRange(tenantId: string): Promise<ContentItem[]> {
+  async findContentItemsByDateRange(
+    organizationId: string,
+  ): Promise<ContentItem[]> {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Start of today
 
@@ -95,11 +94,11 @@ export class ContentCalendarService {
     return this.contentItemRepository.find({
       where: {
         contentCalendar: {
-          tenant: { id: tenantId },
+          organization: { id: organizationId },
         },
         publishDate: Between(today, endDate),
       },
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: {
         publishDate: 'ASC',
       },

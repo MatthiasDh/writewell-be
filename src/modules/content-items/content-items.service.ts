@@ -54,7 +54,7 @@ export class ContentItemsService {
 
   async findAll(): Promise<ContentItem[]> {
     return this.contentItemRepository.find({
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: { publishDate: 'DESC' },
     });
   }
@@ -62,7 +62,7 @@ export class ContentItemsService {
   async findOne(id: string): Promise<ContentItem> {
     const contentItem = await this.contentItemRepository.findOne({
       where: { id },
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
     });
 
     if (!contentItem) {
@@ -75,7 +75,7 @@ export class ContentItemsService {
   async findByCalendar(calendarId: string): Promise<ContentItem[]> {
     return this.contentItemRepository.find({
       where: { contentCalendar: { id: calendarId } },
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: { publishDate: 'DESC' },
     });
   }
@@ -83,7 +83,7 @@ export class ContentItemsService {
   async findByType(type: ContentType): Promise<ContentItem[]> {
     return this.contentItemRepository.find({
       where: { type },
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: { publishDate: 'DESC' },
     });
   }
@@ -96,7 +96,7 @@ export class ContentItemsService {
       where: {
         publishDate: Between(startDate, endDate),
       },
-      relations: ['contentCalendar', 'contentCalendar.account'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: { publishDate: 'ASC' },
     });
   }
@@ -105,12 +105,12 @@ export class ContentItemsService {
     return this.contentItemRepository.find({
       where: {
         contentCalendar: {
-          tenant: {
+          organization: {
             id: accountId,
           },
         },
       },
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: { publishDate: 'DESC' },
     });
   }
@@ -119,14 +119,14 @@ export class ContentItemsService {
     return this.contentItemRepository.find({
       where: {
         contentCalendar: {
-          tenant: {
+          organization: {
             users: {
               id: userId,
             },
           },
         },
       },
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: { publishDate: 'DESC' },
     });
   }
@@ -165,7 +165,7 @@ export class ContentItemsService {
   async findPublished(): Promise<ContentItem[]> {
     return this.contentItemRepository.find({
       where: { isPublished: true },
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: { publishDate: 'DESC' },
     });
   }
@@ -173,7 +173,7 @@ export class ContentItemsService {
   async findDrafts(): Promise<ContentItem[]> {
     return this.contentItemRepository.find({
       where: { isPublished: false },
-      relations: ['contentCalendar', 'contentCalendar.tenant'],
+      relations: ['contentCalendar', 'contentCalendar.organization'],
       order: { publishDate: 'DESC' },
     });
   }
