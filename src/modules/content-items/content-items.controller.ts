@@ -131,19 +131,6 @@ export class ContentItemsController {
     return this.contentItemsService.findByAccount(accountId);
   }
 
-  @Get('user/:userId')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get content items by user ID' })
-  @ApiParam({ name: 'userId', description: 'User ID', type: 'string' })
-  @ApiResponse({
-    status: 200,
-    description: 'Content items retrieved successfully',
-    type: [ContentItemResponseDto],
-  })
-  async findByUser(@Param('userId', ParseUUIDPipe) userId: string) {
-    return this.contentItemsService.findByUser(userId);
-  }
-
   @Get('date-range')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get content items by date range' })

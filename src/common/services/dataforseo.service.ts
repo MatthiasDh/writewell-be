@@ -92,7 +92,6 @@ export class DataForSEOService {
     languageCode: string,
     sortBy: string,
   ): Promise<KeywordData[]> {
-    console.log(keywords);
     const requestData: DataForSEORequest[] = [
       {
         keywords: keywords,
@@ -101,11 +100,11 @@ export class DataForSEOService {
     ];
 
     try {
-      if (process.env.NODE_ENV === 'development') {
-        return Promise.resolve(
-          KEYWORDS_RESPONSE_MOCKUP.keywords as KeywordData[],
-        );
-      }
+      // if (process.env.NODE_ENV === 'development') {
+      //   return Promise.resolve(
+      //     KEYWORDS_RESPONSE_MOCKUP.keywords as KeywordData[],
+      //   );
+      // }
 
       const response = await axios.post<DataForSEOResponse>(
         `${this.baseUrl}/v3/keywords_data/google_ads/search_volume/live`,
@@ -117,8 +116,6 @@ export class DataForSEOService {
           },
         },
       );
-
-      console.log(response.data);
 
       const task = response.data.tasks[0];
 

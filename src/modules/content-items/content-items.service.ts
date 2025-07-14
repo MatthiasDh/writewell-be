@@ -1,27 +1,24 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
 import { ContentItem, ContentType } from '../../entities/content-item.entity';
-import { ContentCalendar } from '../../entities/content-calendar.entity';
 import { CreateContentItemDto } from './dto/create-content-item.dto';
 import { UpdateContentItemDto } from './dto/update-content-item.dto';
+import { ContentItemRepository } from './content-item.repository';
+import { ContentCalendarRepository } from '../content-calendar/content-calendar.repository';
 
 @Injectable()
 export class ContentItemsService {
   constructor(
-    @InjectRepository(ContentItem)
-    private readonly contentItemRepository: Repository<ContentItem>,
-    @InjectRepository(ContentCalendar)
-    private readonly contentCalendarRepository: Repository<ContentCalendar>,
+    private readonly contentItemRepository: ContentItemRepository,
+    private readonly contentCalendarRepository: ContentCalendarRepository,
   ) {}
 
   async create(
     createContentItemDto: CreateContentItemDto,
   ): Promise<ContentItem> {
     try {
-      const contentCalendar = await this.contentCalendarRepository.findOne({
-        where: { id: createContentItemDto.contentCalendarId },
-      });
+      const contentCalendar = await this.contentCalendarRepository.findOne(
+        createContentItemDto.contentCalendarId,
+      );
 
       if (!contentCalendar) {
         throw new HttpException(
@@ -30,16 +27,10 @@ export class ContentItemsService {
         );
       }
 
-      const contentItem = this.contentItemRepository.create({
-        type: createContentItemDto.type,
-        title: createContentItemDto.title,
-        content: createContentItemDto.content,
-        publishDate: createContentItemDto.publishDate,
-        isPublished: createContentItemDto.isPublished || false,
+      const savedItem = await this.contentItemRepository.create(
+        createContentItemDto,
         contentCalendar,
-      });
-
-      const savedItem = await this.contentItemRepository.save(contentItem);
+      );
       return this.findOne(savedItem.id);
     } catch (error) {
       if (error instanceof HttpException) {
@@ -53,17 +44,11 @@ export class ContentItemsService {
   }
 
   async findAll(): Promise<ContentItem[]> {
-    return this.contentItemRepository.find({
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: { publishDate: 'DESC' },
-    });
+    return this.contentItemRepository.findAll();
   }
 
   async findOne(id: string): Promise<ContentItem> {
-    const contentItem = await this.contentItemRepository.findOne({
-      where: { id },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-    });
+    const contentItem = await this.contentItemRepository.findOne(id);
 
     if (!contentItem) {
       throw new HttpException('Content item not found', HttpStatus.NOT_FOUND);
@@ -73,108 +58,58 @@ export class ContentItemsService {
   }
 
   async findByCalendar(calendarId: string): Promise<ContentItem[]> {
-    return this.contentItemRepository.find({
-      where: { contentCalendar: { id: calendarId } },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: { publishDate: 'DESC' },
-    });
+    return this.contentItemRepository.findByCalendar(calendarId);
   }
 
   async findByType(type: ContentType): Promise<ContentItem[]> {
-    return this.contentItemRepository.find({
-      where: { type },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: { publishDate: 'DESC' },
-    });
+    return this.contentItemRepository.findByType(type);
   }
 
   async findByDateRange(
     startDate: Date,
     endDate: Date,
   ): Promise<ContentItem[]> {
-    return this.contentItemRepository.find({
-      where: {
-        publishDate: Between(startDate, endDate),
-      },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: { publishDate: 'ASC' },
-    });
+    return this.contentItemRepository.findByDateRange(startDate, endDate);
   }
 
   async findByAccount(accountId: string): Promise<ContentItem[]> {
-    return this.contentItemRepository.find({
-      where: {
-        contentCalendar: {
-          organization: {
-            id: accountId,
-          },
-        },
-      },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: { publishDate: 'DESC' },
-    });
-  }
-
-  async findByUser(userId: string): Promise<ContentItem[]> {
-    return this.contentItemRepository.find({
-      where: {
-        contentCalendar: {
-          organization: {
-            users: {
-              id: userId,
-            },
-          },
-        },
-      },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: { publishDate: 'DESC' },
-    });
+    return this.contentItemRepository.findByAccount(accountId);
   }
 
   async update(
     id: string,
     updateContentItemDto: UpdateContentItemDto,
   ): Promise<ContentItem> {
-    const contentItem = await this.findOne(id);
-
-    Object.assign(contentItem, updateContentItemDto);
-    await this.contentItemRepository.save(contentItem);
-
-    return this.findOne(id);
+    await this.findOne(id);
+    return this.contentItemRepository.update(id, updateContentItemDto);
   }
 
   async remove(id: string): Promise<void> {
-    const contentItem = await this.findOne(id);
-    await this.contentItemRepository.remove(contentItem);
+    await this.findOne(id);
+    await this.contentItemRepository.remove(id);
   }
 
   async publish(id: string): Promise<ContentItem> {
-    const contentItem = await this.findOne(id);
-    contentItem.isPublished = true;
-    await this.contentItemRepository.save(contentItem);
-    return this.findOne(id);
+    await this.findOne(id);
+    return this.contentItemRepository.publish(id);
   }
 
   async unpublish(id: string): Promise<ContentItem> {
-    const contentItem = await this.findOne(id);
-    contentItem.isPublished = false;
-    await this.contentItemRepository.save(contentItem);
-    return this.findOne(id);
+    await this.findOne(id);
+    return this.contentItemRepository.unpublish(id);
   }
 
   async findPublished(): Promise<ContentItem[]> {
-    return this.contentItemRepository.find({
-      where: { isPublished: true },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: { publishDate: 'DESC' },
-    });
+    return this.contentItemRepository.findPublished();
   }
 
   async findDrafts(): Promise<ContentItem[]> {
-    return this.contentItemRepository.find({
-      where: { isPublished: false },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: { publishDate: 'DESC' },
-    });
+    return this.contentItemRepository.findDrafts();
+  }
+
+  async createContentItems(
+    contentItems: Partial<ContentItem>[],
+  ): Promise<ContentItem[]> {
+    return this.contentItemRepository.createContentItems(contentItems);
   }
 }

@@ -14,6 +14,7 @@ import { OrganizationsModule } from '../organizations/organizations.module';
 import { ContentCalendarModule } from '../content-calendar/content-calendar.module';
 import { ContentItemsModule } from '../content-items/content-items.module';
 import { AuthModule } from '../auth/auth.module';
+import { KeywordModule } from '../keywords/keywords.module';
 
 import { getDatabaseConfig } from '../../config/database.config';
 import { ClerkClientProvider } from '../../providers/clerk.provider';
@@ -36,6 +37,7 @@ import { ClerkAuthGuard } from '../auth/guard/clerck-auth.guard';
     ContentCalendarModule,
     ContentItemsModule,
     AuthModule,
+    KeywordModule,
   ],
   controllers: [AppController],
   providers: [

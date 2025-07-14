@@ -40,14 +40,14 @@ export class OrganizationsService {
   async updateOrganizationDescription(
     organizationId: string,
     title: string,
-    summary: string,
+    description: string,
   ) {
     return this.clerkClient.organizations.updateOrganizationMetadata(
       organizationId,
       {
         publicMetadata: {
           title,
-          summary,
+          description,
         },
       },
     );

@@ -1,7 +1,13 @@
-import { IsString, IsNotEmpty, IsArray, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsArray,
+  IsOptional,
+  IsUUID,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateOrganizationDto {
+export class CreateOrganizationRequestDto {
   @ApiProperty({
     description: 'Organization domain',
     example: 'mycompany.com',
@@ -9,8 +15,7 @@ export class CreateOrganizationDto {
   })
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  domain?: string;
+  domain: string;
 
   @ApiProperty({
     description: 'Organization title',
@@ -29,12 +34,13 @@ export class CreateOrganizationDto {
   description: string;
 
   @ApiProperty({
-    description: 'Relevant keywords for the organization',
-    example: ['technology', 'software', 'innovation'],
-    required: false,
+    description: 'Relevant keyword IDs for the organization',
+    example: [
+      '550e8400-e29b-41d4-a716-446655440000',
+      '550e8400-e29b-41d4-a716-446655440001',
+    ],
   })
-  @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  relevantKeywords?: string[];
+  @IsUUID('4', { each: true })
+  relevantKeywordIds: string[];
 }

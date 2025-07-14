@@ -1,3 +1,4 @@
+import { User } from '@clerk/backend';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AuthSuccessObject {
@@ -19,3 +20,5 @@ export class AuthSuccessObject {
   })
   expires: number;
 }
+
+export type UserWithOrg = User & { orgId: string };

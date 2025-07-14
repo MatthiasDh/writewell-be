@@ -6,9 +6,6 @@ import {
   Param,
   ValidationPipe,
   ParseUUIDPipe,
-  Post,
-  UseInterceptors,
-  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -23,21 +20,12 @@ import {
 import { ContentCalendarService } from './content-calendar.service';
 import { UpdateContentCalendarDto } from './dto/update-content-calendar.dto';
 import { ContentCalendarResponseDto } from './dto/content-calendar-response.dto';
-import { OpenAIService } from '../../common/services/openai.service';
-import { ContentType } from '../../entities/content-item.entity';
-import { CurrentUserInterceptor } from '../../interceptors/current-user.interceptor';
-import { OrganizationsService } from '../organizations/organizations.service';
-import { CurrentUser } from '../../decorators/current-user.decorator';
-import { User } from '@clerk/backend';
 
 @ApiTags('content-calendars')
 @Controller('organization/content-calendar')
-@UseInterceptors(CurrentUserInterceptor)
 export class ContentCalendarController {
   constructor(
     private readonly contentCalendarService: ContentCalendarService,
-    private readonly openaiService: OpenAIService,
-    private readonly organizationsService: OrganizationsService,
   ) {}
 
   @Patch(':id')

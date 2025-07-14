@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ContentCalendarResponseDto } from '../../content-calendar/dto/content-calendar-response.dto';
 
 export class OrganizationResponseDto {
   @ApiProperty({
@@ -20,10 +21,10 @@ export class OrganizationResponseDto {
   description: string;
 
   @ApiProperty({
-    description: 'Relevant keywords for the organization',
-    example: ['technology', 'software', 'innovation'],
+    description: 'Content calendars associated with the organization',
+    type: [ContentCalendarResponseDto],
   })
-  relevantKeywords: string[];
+  contentCalendars: ContentCalendarResponseDto[];
 
   @ApiProperty({
     description: 'Organization creation date',

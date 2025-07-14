@@ -5,10 +5,8 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   ValidationPipe,
   ParseUUIDPipe,
-  HttpCode,
   HttpStatus,
   UseInterceptors,
   HttpException,
@@ -18,26 +16,21 @@ import {
   ApiOperation,
   ApiResponse,
   ApiParam,
-  ApiBody,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { OrganizationsService } from './organizations.service';
-import { CreateOrganizationDto } from './dto/create-organization.dto';
+import { CreateOrganizationRequestDto } from './dto/create-organization-request.dto';
 import { OrganizationResponseDto } from './dto/organization-response.dto';
 import { PuppeteerService } from '../../common/services/puppeteer.service';
 import { OrganizationSummaryRequestDto } from './dto/generate-summary-request.dto';
 import { CurrentUser } from '../../decorators/current-user.decorator';
 import { OrganizationSummaryResponseDto } from './dto/generate-summary-response.dto';
-import { OpenAIService } from '../../common/services/openai.service';
-import { DataForSEOService } from '../../common/services/dataforseo.service';
-import { BusinessRelevantKeywordsRequestDto } from './dto/generate-keywords-request.dto';
-import { BusinessRelevantKeywordsResponseDTO } from './dto/generate-keywords-response.dto';
-import { type UpdateOrganizationParams } from './organizations.type';
 import { UpdateOrganizationDto } from './organizations.dtos';
 import { User } from '@clerk/backend';
-import { sanitizeUrl } from '../../common/helpers/url.helper';
+import { OrganizationRegistrationService } from '../../flows/organization-registration/organization-registration.service';
+import { TransactionInterceptor } from '../../common/transaction.interceptor';
 
 @ApiTags('organizations')
 @Controller('organizations')
@@ -45,9 +38,28 @@ export class OrganizationsController {
   constructor(
     private readonly organizationsService: OrganizationsService,
     private readonly puppeteerService: PuppeteerService,
-    private readonly openaiService: OpenAIService,
-    private readonly dataForSEOService: DataForSEOService,
+    private readonly organizationRegistrationService: OrganizationRegistrationService,
   ) {}
+
+  @Post()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create an organization' })
+  @ApiResponse({
+    status: 200,
+    description: 'Organization created successfully',
+    type: OrganizationResponseDto,
+  })
+  @UseInterceptors(TransactionInterceptor)
+  async create(
+    @CurrentUser() user: User,
+    @Body() createOrganizationRequestDto: CreateOrganizationRequestDto,
+  ) {
+    return this.organizationRegistrationService.executeOrganizationRegistrationFlow(
+      createOrganizationRequestDto,
+      user.id,
+    );
+  }
+
   @Get()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all organizations' })
@@ -175,32 +187,15 @@ export class OrganizationsController {
   @ApiResponse({
     status: 200,
     description: 'Summary generated successfully',
-    type: String,
+    type: OrganizationSummaryResponseDto,
   })
   async generateSummary(
-    @CurrentUser() user: User,
     @Body() organizationSummaryRequest: OrganizationSummaryRequestDto,
   ): Promise<OrganizationSummaryResponseDto> {
     try {
-      // TODO: If the user has an organization already, do not generate a new summary
-
       // Scrape html to get summary
       const summary = await this.puppeteerService.scanUrl(
         organizationSummaryRequest.url,
-      );
-
-      // Create organization based on the website url
-      const newOrganization =
-        await this.organizationsService.createOrganization({
-          name: sanitizeUrl(organizationSummaryRequest.url).replace('-', ' '),
-          slug: sanitizeUrl(organizationSummaryRequest.url),
-        });
-
-      // Update organization with generated title and summary
-      await this.organizationsService.updateOrganizationDescription(
-        newOrganization.id,
-        summary.title,
-        summary.summary,
       );
 
       return {

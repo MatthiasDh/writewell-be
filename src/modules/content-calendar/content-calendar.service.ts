@@ -1,31 +1,25 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
-import { ContentCalendar } from '../../entities/content-calendar.entity';
+import { ContentCalendar } from './content-calendar.entity';
 import { UpdateContentCalendarDto } from './dto/update-content-calendar.dto';
 import { ContentItem } from '../../entities/content-item.entity';
+import { ContentCalendarRepository } from './content-calendar.repository';
 
 @Injectable()
 export class ContentCalendarService {
   constructor(
-    @InjectRepository(ContentCalendar)
-    private readonly contentCalendarRepository: Repository<ContentCalendar>,
-    @InjectRepository(ContentItem)
-    private readonly contentItemRepository: Repository<ContentItem>,
+    private readonly contentCalendarRepository: ContentCalendarRepository,
   ) {}
 
+  async create(organizationId: string): Promise<ContentCalendar> {
+    return this.contentCalendarRepository.create(organizationId);
+  }
+
   async findAll(organizationId: string): Promise<ContentCalendar[]> {
-    return this.contentCalendarRepository.find({
-      where: { organization: { id: organizationId } },
-      relations: ['organization', 'contentItems'],
-    });
+    return this.contentCalendarRepository.findAll(organizationId);
   }
 
   async findOne(id: string): Promise<ContentCalendar> {
-    const contentCalendar = await this.contentCalendarRepository.findOne({
-      where: { organization: { id } },
-      relations: ['organization', 'contentItems'],
-    });
+    const contentCalendar = await this.contentCalendarRepository.findOne(id);
 
     if (!contentCalendar) {
       throw new HttpException(
@@ -38,10 +32,7 @@ export class ContentCalendarService {
   }
 
   async findByAccount(accountId: string): Promise<ContentCalendar | null> {
-    return this.contentCalendarRepository.findOne({
-      where: { organization: { id: accountId } },
-      relations: ['organization', 'contentItems'],
-    });
+    return this.contentCalendarRepository.findByAccount(accountId);
   }
 
   async update(
@@ -49,59 +40,30 @@ export class ContentCalendarService {
     updateContentCalendarDto: UpdateContentCalendarDto,
   ): Promise<ContentCalendar> {
     const contentCalendar = await this.findOne(id);
-
-    Object.assign(contentCalendar, updateContentCalendarDto);
-    await this.contentCalendarRepository.save(contentCalendar);
-
-    return this.findOne(id);
+    return this.contentCalendarRepository.update(id, updateContentCalendarDto);
   }
 
   async remove(id: string): Promise<void> {
-    const contentCalendar = await this.findOne(id);
-    await this.contentCalendarRepository.remove(contentCalendar);
-  }
-
-  async findByUser(userId: string): Promise<ContentCalendar[]> {
-    return this.contentCalendarRepository.find({
-      where: {
-        organization: {
-          users: {
-            id: userId,
-          },
-        },
-      },
-      relations: ['organization', 'contentItems'],
-    });
+    await this.findOne(id);
+    await this.contentCalendarRepository.remove(id);
   }
 
   async createContentItems(
     contentItems: Partial<ContentItem>[],
   ): Promise<ContentItem[]> {
-    const createdItems = this.contentItemRepository.create(contentItems);
-
-    return this.contentItemRepository.save(createdItems);
+    // This method should be moved to ContentItemsService
+    // For now, we'll delegate to the repository
+    throw new HttpException(
+      'This method should be called through ContentItemsService',
+      HttpStatus.BAD_REQUEST,
+    );
   }
 
   async findContentItemsByDateRange(
     organizationId: string,
   ): Promise<ContentItem[]> {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Start of today
-
-    const endDate = new Date(today);
-    endDate.setDate(today.getDate() + 30); // 30 days from today
-
-    return this.contentItemRepository.find({
-      where: {
-        contentCalendar: {
-          organization: { id: organizationId },
-        },
-        publishDate: Between(today, endDate),
-      },
-      relations: ['contentCalendar', 'contentCalendar.organization'],
-      order: {
-        publishDate: 'ASC',
-      },
-    });
+    return this.contentCalendarRepository.findContentItemsByDateRange(
+      organizationId,
+    );
   }
 }

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ContentItemResponseDto } from '../../content-items/dto/content-item-response.dto';
+import { KeywordResponseDto } from '../../organizations/dto/keyword-response.dto';
 
 export class ContentCalendarResponseDto {
   @ApiProperty({
@@ -22,6 +23,12 @@ export class ContentCalendarResponseDto {
   description: string | null;
 
   @ApiProperty({
+    description: 'Organization ID',
+    example: '550e8400-e29b-41d4-a716-446655440000',
+  })
+  organizationId: string;
+
+  @ApiProperty({
     description: 'Content calendar creation date',
     example: '2023-01-01T00:00:00.000Z',
   })
@@ -38,4 +45,10 @@ export class ContentCalendarResponseDto {
     type: [ContentItemResponseDto],
   })
   contentItems: ContentItemResponseDto[];
+
+  @ApiProperty({
+    description: 'Keywords associated with the content calendar',
+    type: [KeywordResponseDto],
+  })
+  keywords: KeywordResponseDto[];
 }

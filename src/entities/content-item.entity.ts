@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ContentCalendar } from './content-calendar.entity';
+import { ContentCalendar } from '../modules/content-calendar/content-calendar.entity';
 
 export enum ContentType {
   BLOG = 'blog',

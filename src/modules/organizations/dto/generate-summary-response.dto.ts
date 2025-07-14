@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class OrganizationSummaryResponseDto {
-  @ApiProperty({ description: 'Updated business title' })
+  @ApiProperty()
   title: string;
 
-  @ApiProperty({ description: 'Updated business summary' })
+  @ApiProperty()
   summary: string;
 }

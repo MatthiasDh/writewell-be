@@ -8,8 +8,8 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { ContentItem } from './content-item.entity';
-import { Organization } from '@clerk/backend';
+import { ContentItem } from '../../entities/content-item.entity';
+import { ContentCalendarKeyword } from '../content-calendar-keywords/content-calendar-keyword.entity';
 
 @Entity('content_calendars')
 export class ContentCalendar {
@@ -28,9 +28,15 @@ export class ContentCalendar {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'varchar' })
   organizationId: string;
 
   @OneToMany(() => ContentItem, (contentItem) => contentItem.contentCalendar)
   contentItems: ContentItem[];
+
+  @OneToMany(
+    () => ContentCalendarKeyword,
+    (contentCalendarKeyword) => contentCalendarKeyword.contentCalendar,
+  )
+  keywords: ContentCalendarKeyword[];
 }
