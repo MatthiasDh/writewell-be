@@ -2,11 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { isValidUrl } from '../helpers/url.helper';
 import { OrganizationSummaryResponseDto } from '../../modules/organizations/dto/generate-summary-response.dto';
 import puppeteer, { Browser, Page } from 'puppeteer';
-import { OpenAIService } from './openai.service';
+import { LLMService } from './llm.service';
 
 @Injectable()
 export class PuppeteerService {
-  constructor(private readonly openaiService: OpenAIService) {}
+  constructor(private readonly llmService: LLMService) {}
 
   async scanUrl(url: string): Promise<OrganizationSummaryResponseDto> {
     let browser: Browser | undefined;
@@ -56,8 +56,7 @@ export class PuppeteerService {
       const textContent = this.extractTextFromHtml(htmlContent);
 
       // Process with OpenAI
-      const summary =
-        await this.openaiService.getSummaryFromBusinessContext(textContent);
+      const summary = await this.llmService.getBusinessDescription(textContent);
 
       return summary;
     } catch (error: unknown) {

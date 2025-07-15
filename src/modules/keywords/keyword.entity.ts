@@ -5,8 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
-import { ContentCalendarKeyword } from '../content-calendar-keywords/content-calendar-keyword.entity';
+import { ContentCalendar } from '../content-calendar/content-calendar.entity';
 
 @Entity('keywords')
 export class Keyword {
@@ -16,32 +17,29 @@ export class Keyword {
   @Column({ unique: true })
   keyword: string;
 
-  @Column('int')
-  search_volume: number;
+  @Column('int', { nullable: true })
+  search_volume?: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  cpc: number;
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  cpc?: number;
 
-  @Column()
-  competition: string;
+  @Column({ nullable: true })
+  competition?: string;
 
-  @Column('int')
-  competition_index: number;
+  @Column('int', { nullable: true })
+  competition_index?: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  low_top_of_page_bid: number;
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  low_top_of_page_bid?: number;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  high_top_of_page_bid: number;
+  @Column('decimal', { precision: 10, scale: 2, nullable: true })
+  high_top_of_page_bid?: number;
 
   @CreateDateColumn()
   created_at: Date;
 
-  @OneToMany(
-    () => ContentCalendarKeyword,
-    (contentCalendarKeyword) => contentCalendarKeyword.keyword,
-  )
-  contentCalendars: ContentCalendarKeyword[];
+  @ManyToMany(() => ContentCalendar)
+  contentCalendars: ContentCalendar[];
 
   @UpdateDateColumn()
   updated_at: Date;

@@ -3,9 +3,9 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: nestjs_postgres
+    container_name: writewell_postgres
     environment:
-      POSTGRES_DB: nestjs_api
+      POSTGRES_DB: writewellDB
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:

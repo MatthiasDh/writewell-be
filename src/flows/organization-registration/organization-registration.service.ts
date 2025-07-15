@@ -3,14 +3,14 @@ import { OrganizationsService } from '../../modules/organizations/organizations.
 import { ContentCalendarService } from '../../modules/content-calendar/content-calendar.service';
 import { CreateOrganizationRequestDto } from '../../modules/organizations/dto/create-organization-request.dto';
 import { sanitizeUrl } from '../../common/helpers/url.helper';
-import { ContentCalendarKeywordService } from '../../modules/content-calendar-keywords/content-calendar-keyword.service';
+import { ContentItemsService } from '../../modules/content-items/content-items.service';
 
 @Injectable()
 export class OrganizationRegistrationService {
   constructor(
     private readonly organizationsService: OrganizationsService,
     private readonly contentCalendarService: ContentCalendarService,
-    private readonly contentCalendarKeywordService: ContentCalendarKeywordService,
+    private readonly contentItemsService: ContentItemsService,
   ) {}
 
   /**
@@ -19,7 +19,7 @@ export class OrganizationRegistrationService {
   async executeOrganizationRegistrationFlow(
     createOrganizationDto: CreateOrganizationRequestDto,
     userId: string,
-  ): Promise<void> {
+  ): Promise<string> {
     // Create organization based on the website url
     const newOrganization = await this.organizationsService.createOrganization({
       name: sanitizeUrl(createOrganizationDto.domain).replace('-', ' '),
@@ -36,12 +36,18 @@ export class OrganizationRegistrationService {
       newOrganization.id,
     );
 
-    // Add keywords to the content calendar instead of directly to the organization
-    await this.contentCalendarKeywordService.addKeywordsToContentCalendar(
+    // Add content calendar to the organization
+    await this.contentCalendarService.addKeywords(
       contentCalendar.id,
       createOrganizationDto.relevantKeywordIds,
     );
 
-    return;
+    // Populate 30 days worth of topics for the content calendar
+    await this.contentItemsService.generateTopicsForCalendar(
+      contentCalendar.id,
+      30,
+    );
+
+    return newOrganization.id;
   }
 }

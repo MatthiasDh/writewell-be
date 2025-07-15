@@ -1,11 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Request } from 'express';
-import { DataSource, Between } from 'typeorm';
+import { DataSource, Between, In } from 'typeorm';
 import { REQUEST } from '@nestjs/core';
 import { BaseRepository } from '../../common/base.repository';
 import { ContentCalendar } from './content-calendar.entity';
-import { ContentItem } from '../../entities/content-item.entity';
-import { UpdateContentCalendarDto } from './dto/update-content-calendar.dto';
+import { ContentItem } from '../content-items/content-item.entity';
+import { Keyword } from '../keywords/keyword.entity';
 
 @Injectable()
 export class ContentCalendarRepository extends BaseRepository {
@@ -24,12 +30,39 @@ export class ContentCalendarRepository extends BaseRepository {
     return repository.save(contentCalendar);
   }
 
-  async findAll(organizationId: string): Promise<ContentCalendar[]> {
-    const repository = this.getRepository(ContentCalendar);
-    return repository.find({
-      where: { organizationId: organizationId },
-      relations: ['contentItems'],
-    });
+  async addKeywords(
+    contentCalendarId: string,
+    keywordIds: string[],
+  ): Promise<void> {
+    try {
+      const repository = this.getRepository(ContentCalendar);
+
+      const calendar = await repository.findOne({
+        where: { id: contentCalendarId },
+        relations: ['keywords'],
+      });
+
+      if (!calendar) {
+        throw new NotFoundException('Content calendar not found');
+      }
+
+      // Find the keywords to add
+      const keywords = await this.getRepository(Keyword).find({
+        where: { id: In(keywordIds) },
+      });
+
+      if (!keywords.length) {
+        throw new NotFoundException('No keywords found');
+      }
+
+      calendar.keywords = [...calendar.keywords, ...keywords];
+
+      await repository.save(calendar);
+
+      return;
+    } catch (e) {
+      throw new HttpException('Something went wrong', HttpStatus.FORBIDDEN);
+    }
   }
 
   async findOne(id: string): Promise<ContentCalendar | null> {
@@ -38,32 +71,6 @@ export class ContentCalendarRepository extends BaseRepository {
       where: { id },
       relations: ['contentItems'],
     });
-  }
-
-  async findByAccount(accountId: string): Promise<ContentCalendar | null> {
-    const repository = this.getRepository(ContentCalendar);
-    return repository.findOne({
-      where: { organizationId: accountId },
-      relations: ['contentItems'],
-    });
-  }
-
-  async update(
-    id: string,
-    updateContentCalendarDto: UpdateContentCalendarDto,
-  ): Promise<ContentCalendar> {
-    const repository = this.getRepository(ContentCalendar);
-    await repository.update(id, updateContentCalendarDto);
-    const result = await this.findOne(id);
-    if (!result) {
-      throw new Error('ContentCalendar not found after update');
-    }
-    return result;
-  }
-
-  async remove(id: string): Promise<void> {
-    const repository = this.getRepository(ContentCalendar);
-    await repository.delete(id);
   }
 
   async findContentItemsByDateRange(
@@ -87,6 +94,36 @@ export class ContentCalendarRepository extends BaseRepository {
       order: {
         publishDate: 'ASC',
       },
+    });
+  }
+
+  async findByIdAndOrg(
+    calendarId: string,
+    orgId: string,
+  ): Promise<ContentCalendar | null> {
+    const repository = this.getRepository(ContentCalendar);
+
+    return repository.findOne({
+      where: { id: calendarId, organizationId: orgId },
+      relations: ['contentItems', 'keywords'],
+    });
+  }
+
+  async findByOrgId(orgId: string): Promise<ContentCalendar | null> {
+    const repository = this.getRepository(ContentCalendar);
+
+    return repository.findOne({
+      where: { organizationId: orgId },
+      relations: ['contentItems', 'keywords'],
+    });
+  }
+
+  async findById(calendarId: string): Promise<ContentCalendar | null> {
+    const repository = this.getRepository(ContentCalendar);
+
+    return repository.findOne({
+      where: { id: calendarId },
+      relations: ['contentItems', 'keywords'],
     });
   }
 }

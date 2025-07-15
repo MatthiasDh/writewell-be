@@ -8,7 +8,7 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ContentType } from '../../../entities/content-item.entity';
+import { ContentType } from '../content-item.entity';
 
 export class CreateContentItemDto {
   @ApiProperty({

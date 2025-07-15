@@ -4,9 +4,10 @@ import { ClerkClient } from '@clerk/backend';
 import {
   CreateOrganizationParams,
   UpdateOrganizationParams,
-  OrganizationListParams,
-  UpdateOrganizationMetadataParams,
 } from './organizations.type';
+import { LLMService } from '../../common/services/llm.service';
+import { KeywordRepository } from '../keywords/keywords.repository';
+import { DataForSEOService } from '../../common/services/dataforseo.service';
 
 @Injectable()
 export class OrganizationsService {
@@ -14,10 +15,6 @@ export class OrganizationsService {
     @Inject('ClerkClient')
     private readonly clerkClient: ClerkClient,
   ) {}
-
-  async getAllOrganizations(params: OrganizationListParams) {
-    return this.clerkClient.organizations.getOrganizationList(params);
-  }
 
   async getOrganization(organizationId: string) {
     return this.clerkClient.organizations.getOrganization({ organizationId });

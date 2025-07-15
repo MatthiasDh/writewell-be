@@ -1,15 +1,14 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import axios from 'axios';
-import { KEYWORDS_RESPONSE_MOCKUP } from '../mockup/keywords-response.mockup';
 
 type KeywordData = {
   keyword: string;
-  search_volume: number;
-  cpc: number;
-  competition: 'LOW' | 'MEDIUM' | 'HIGH';
-  competition_index: number;
-  low_top_of_page_bid: number;
-  high_top_of_page_bid: number;
+  search_volume?: number;
+  cpc?: number;
+  competition?: 'LOW' | 'MEDIUM' | 'HIGH';
+  competition_index?: number;
+  low_top_of_page_bid?: number;
+  high_top_of_page_bid?: number;
 };
 
 type DataForSEORequest = {
@@ -137,7 +136,6 @@ export class DataForSEOService {
         high_top_of_page_bid: item.high_top_of_page_bid,
       }));
     } catch (error) {
-      console.log(error);
       if (axios.isAxiosError(error)) {
         console.error('Axios error:', error.response?.data || error.message);
         throw new Error(`DataForSEO API request failed: ${error.message}`);

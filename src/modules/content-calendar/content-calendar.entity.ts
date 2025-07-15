@@ -2,14 +2,15 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  JoinColumn,
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
+  ManyToOne,
 } from 'typeorm';
-import { ContentItem } from '../../entities/content-item.entity';
-import { ContentCalendarKeyword } from '../content-calendar-keywords/content-calendar-keyword.entity';
+import { ContentItem } from '../content-items/content-item.entity';
+import { Keyword } from '../keywords/keyword.entity';
 
 @Entity('content_calendars')
 export class ContentCalendar {
@@ -34,9 +35,9 @@ export class ContentCalendar {
   @OneToMany(() => ContentItem, (contentItem) => contentItem.contentCalendar)
   contentItems: ContentItem[];
 
-  @OneToMany(
-    () => ContentCalendarKeyword,
-    (contentCalendarKeyword) => contentCalendarKeyword.contentCalendar,
-  )
-  keywords: ContentCalendarKeyword[];
+  @ManyToMany(() => Keyword)
+  @JoinTable({
+    name: 'content_calendar_keywords',
+  })
+  keywords: Keyword[];
 }

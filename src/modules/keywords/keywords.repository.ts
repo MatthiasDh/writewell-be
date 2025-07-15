@@ -29,9 +29,10 @@ export class KeywordRepository extends BaseRepository {
     return repository.save(keywords);
   }
 
-  async findAll(): Promise<Keyword[]> {
+  async findAllByCalendarId(calendarId: string): Promise<Keyword[]> {
     const repository = this.getRepository(Keyword);
     return repository.find({
+      where: { contentCalendars: { id: calendarId } },
       order: { search_volume: 'DESC' },
     });
   }

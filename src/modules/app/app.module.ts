@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DataForSEOService } from '../../common/services/dataforseo.service';
-import { OpenAIService } from '../../common/services/openai.service';
 import { PuppeteerService } from '../../common/services/puppeteer.service';
 
 // Import new modules
@@ -20,6 +19,7 @@ import { getDatabaseConfig } from '../../config/database.config';
 import { ClerkClientProvider } from '../../providers/clerk.provider';
 import { APP_GUARD } from '@nestjs/core';
 import { ClerkAuthGuard } from '../auth/guard/clerck-auth.guard';
+import { LLMService } from '../../common/services/llm.service';
 
 @Module({
   imports: [
@@ -43,8 +43,8 @@ import { ClerkAuthGuard } from '../auth/guard/clerck-auth.guard';
   providers: [
     AppService,
     PuppeteerService,
-    OpenAIService,
     DataForSEOService,
+    LLMService,
     ClerkClientProvider,
     {
       provide: APP_GUARD,

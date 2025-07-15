@@ -9,7 +9,7 @@ export const getDatabaseConfig = (
   port: configService.get('DB_PORT', 5432),
   username: configService.get('DB_USERNAME', 'postgres'),
   password: configService.get('DB_PASSWORD', 'password'),
-  database: configService.get('DB_NAME', 'nestjs_api'),
+  database: configService.get('DB_NAME', 'writewellDB'),
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   synchronize: configService.get('NODE_ENV') !== 'production',
   logging: false,

@@ -6,6 +6,8 @@ import {
   Param,
   ValidationPipe,
   ParseUUIDPipe,
+  HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,8 +20,12 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ContentCalendarService } from './content-calendar.service';
-import { UpdateContentCalendarDto } from './dto/update-content-calendar.dto';
 import { ContentCalendarResponseDto } from './dto/content-calendar-response.dto';
+import { CurrentUser } from '../../decorators/current-user.decorator';
+import { UserWithOrg } from '../auth/auth.types';
+import { ContentCalendar } from './content-calendar.entity';
+import { ContentItemsService } from '../content-items/content-items.service';
+import { KeywordService } from '../keywords/keywords.service';
 
 @ApiTags('content-calendars')
 @Controller('organization/content-calendar')
@@ -28,115 +34,26 @@ export class ContentCalendarController {
     private readonly contentCalendarService: ContentCalendarService,
   ) {}
 
-  @Patch(':id')
+  @Get()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a content calendar' })
-  @ApiParam({ name: 'id', description: 'Content calendar ID', type: 'string' })
+  @ApiOperation({ summary: 'Get all', operationId: 'getContentCalendar' })
   @ApiResponse({
     status: 200,
-    description: 'Content calendar updated successfully',
+    description: 'Content calendar with content items retrieved successfully',
     type: ContentCalendarResponseDto,
   })
-  @ApiNotFoundResponse({ description: 'Content calendar not found' })
-  @ApiBadRequestResponse({ description: 'Invalid input data' })
-  @ApiBody({ type: UpdateContentCalendarDto })
-  async update(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body(ValidationPipe) updateContentCalendarDto: UpdateContentCalendarDto,
-  ) {
-    return this.contentCalendarService.update(id, updateContentCalendarDto);
+  @ApiNotFoundResponse({
+    description: 'Content calendar not found',
+  })
+  async getContentCalendar(
+    @CurrentUser() { orgId }: UserWithOrg,
+  ): Promise<ContentCalendar | null> {
+    const calendar = await this.contentCalendarService.findByOrgId(orgId);
+
+    if (!calendar) {
+      throw new NotFoundException('Content calendar not found');
+    }
+
+    return calendar;
   }
-
-  // @Get()
-  // @ApiBearerAuth()
-  // @ApiOperation({
-  //   summary: 'Get content calendar with upcoming content items',
-  // })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Content calendar with content items retrieved successfully',
-  //   type: ContentCalendarResponseDto,
-  // })
-  // async getUpcomingContentItems(@CurrentUser() {  }: User) {
-  //   const contentItems =
-  //     await this.contentCalendarService.findContentItemsByDateRange(tenantId);
-  //   console.log(contentItems);
-  //   const contentCalendar = await this.contentCalendarService.findOne(tenantId);
-
-  //   return {
-  //     ...contentCalendar,
-  //     contentItems,
-  //   };
-  // }
-
-  // @Post('generate')
-  // @ApiBearerAuth()
-  // @ApiOperation({ summary: 'Generate content for a content calendar' })
-  // @ApiParam({ name: 'id', description: 'Content calendar ID', type: 'string' })
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'Content generated successfully',
-  // })
-  // async generateContent(
-  //   @CurrentUser() user: JWTUser,
-  //   @Body() keywords: string[],
-  // ) {
-  //   if (!user.tenantId) {
-  //     throw new BadRequestException('User has no tenant');
-  //   }
-
-  //   const existingContentItems =
-  //     await this.contentCalendarService.findContentItemsByDateRange(
-  //       user.tenantId,
-  //     );
-
-  //   // If there are fewer than 23 content items in the next 30 days, generate more
-  //   const itemsToGenerate = 30 - existingContentItems.length;
-
-  //   if (itemsToGenerate >= 7) {
-  //     console.log(`Generating ${itemsToGenerate} more content items`);
-
-  //     // Calculate the starting date for new content items
-  //     let startDate = new Date();
-  //     if (existingContentItems.length > 0) {
-  //       // Find the latest publish date and add 1 day
-  //       const latestItem =
-  //         existingContentItems[existingContentItems.length - 1];
-  //       startDate = new Date(latestItem.publishDate);
-  //       startDate.setDate(startDate.getDate() + 1);
-  //     }
-
-  //     const blogTopics = await this.openaiService.getBlogTopicsFromKeywords(
-  //       keywords,
-  //       itemsToGenerate,
-  //     );
-
-  //     // Get organization for user
-  //     const organization = await this.organizationsService.findOne(
-  //       user.tenantId,
-  //     );
-
-  //     if (!organization.contentCalendar) {
-  //       throw new BadRequestException(
-  //         'Organization does not have a content calendar',
-  //       );
-  //     }
-
-  //     const blogContentItems = blogTopics.map((topic, index) => ({
-  //       type: ContentType.BLOG,
-  //       title: topic,
-  //       content: '',
-  //       publishDate: new Date(
-  //         startDate.getTime() + index * 24 * 60 * 60 * 1000,
-  //       ),
-  //       isPublished: false,
-  //       contentCalendar: organization.contentCalendar,
-  //     }));
-
-  //     console.log(`Creating ${blogContentItems.length} content items`);
-  //     await this.contentCalendarService.createContentItems(blogContentItems);
-  //   }
-
-  //   return null;
-  // }
 }

@@ -1,115 +1,71 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { ContentItem, ContentType } from '../../entities/content-item.entity';
-import { CreateContentItemDto } from './dto/create-content-item.dto';
-import { UpdateContentItemDto } from './dto/update-content-item.dto';
+import { ContentItem, ContentType } from './content-item.entity';
 import { ContentItemRepository } from './content-item.repository';
-import { ContentCalendarRepository } from '../content-calendar/content-calendar.repository';
+import { LLMService } from '../../common/services/llm.service';
+import { ContentCalendarService } from '../content-calendar/content-calendar.service';
 
 @Injectable()
 export class ContentItemsService {
   constructor(
     private readonly contentItemRepository: ContentItemRepository,
-    private readonly contentCalendarRepository: ContentCalendarRepository,
+    private readonly contentCalendarService: ContentCalendarService,
+    private readonly llmService: LLMService,
   ) {}
 
-  async create(
-    createContentItemDto: CreateContentItemDto,
-  ): Promise<ContentItem> {
-    try {
-      const contentCalendar = await this.contentCalendarRepository.findOne(
-        createContentItemDto.contentCalendarId,
+  async findAllByCalendarId(calendarId: string): Promise<ContentItem[]> {
+    return this.contentItemRepository.findAllByCalendarId(calendarId);
+  }
+
+  async generateTopicsForCalendar(
+    calendarId: string,
+    numTopics: number,
+  ): Promise<ContentItem[]> {
+    const calendar = await this.contentCalendarService.findById(calendarId);
+
+    if (!calendar) {
+      throw new HttpException('Calendar not found', HttpStatus.NOT_FOUND);
+    }
+
+    const existingContentItems =
+      await this.contentItemRepository.findAllByCalendarId(calendarId);
+
+    // If there are fewer than 23 content items in the next 30 days, generate more
+    const itemsToGenerate = 30 - existingContentItems.length;
+
+    let blogContentItems: ContentItem[] = [];
+
+    if (itemsToGenerate >= 7) {
+      // Calculate the starting date for new content items
+      let startDate = new Date();
+      if (existingContentItems.length > 0) {
+        // Find the latest publish date and add 1 day
+        const latestItem =
+          existingContentItems[existingContentItems.length - 1];
+        startDate = new Date(latestItem.publishDate);
+        startDate.setDate(startDate.getDate() + 1);
+      }
+
+      const blogTopics = await this.llmService.getContentTopics(
+        calendar.keywords.map((keyword) => keyword.keyword),
+        itemsToGenerate,
       );
 
-      if (!contentCalendar) {
-        throw new HttpException(
-          'Content calendar not found',
-          HttpStatus.NOT_FOUND,
+      blogContentItems = blogTopics.map((topic, index) => {
+        const contentItem = new ContentItem();
+        contentItem.type = ContentType.BLOG;
+        contentItem.title = topic;
+        contentItem.content = '';
+        contentItem.publishDate = new Date(
+          startDate.getTime() + index * 24 * 60 * 60 * 1000,
         );
-      }
+        contentItem.isPublished = false;
+        contentItem.contentCalendar = calendar;
+        return contentItem;
+      });
 
-      const savedItem = await this.contentItemRepository.create(
-        createContentItemDto,
-        contentCalendar,
-      );
-      return this.findOne(savedItem.id);
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Failed to create content item',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  async findAll(): Promise<ContentItem[]> {
-    return this.contentItemRepository.findAll();
-  }
-
-  async findOne(id: string): Promise<ContentItem> {
-    const contentItem = await this.contentItemRepository.findOne(id);
-
-    if (!contentItem) {
-      throw new HttpException('Content item not found', HttpStatus.NOT_FOUND);
+      await this.contentItemRepository.createMultiple(blogContentItems);
     }
 
-    return contentItem;
-  }
-
-  async findByCalendar(calendarId: string): Promise<ContentItem[]> {
-    return this.contentItemRepository.findByCalendar(calendarId);
-  }
-
-  async findByType(type: ContentType): Promise<ContentItem[]> {
-    return this.contentItemRepository.findByType(type);
-  }
-
-  async findByDateRange(
-    startDate: Date,
-    endDate: Date,
-  ): Promise<ContentItem[]> {
-    return this.contentItemRepository.findByDateRange(startDate, endDate);
-  }
-
-  async findByAccount(accountId: string): Promise<ContentItem[]> {
-    return this.contentItemRepository.findByAccount(accountId);
-  }
-
-  async update(
-    id: string,
-    updateContentItemDto: UpdateContentItemDto,
-  ): Promise<ContentItem> {
-    await this.findOne(id);
-    return this.contentItemRepository.update(id, updateContentItemDto);
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.findOne(id);
-    await this.contentItemRepository.remove(id);
-  }
-
-  async publish(id: string): Promise<ContentItem> {
-    await this.findOne(id);
-    return this.contentItemRepository.publish(id);
-  }
-
-  async unpublish(id: string): Promise<ContentItem> {
-    await this.findOne(id);
-    return this.contentItemRepository.unpublish(id);
-  }
-
-  async findPublished(): Promise<ContentItem[]> {
-    return this.contentItemRepository.findPublished();
-  }
-
-  async findDrafts(): Promise<ContentItem[]> {
-    return this.contentItemRepository.findDrafts();
-  }
-
-  async createContentItems(
-    contentItems: Partial<ContentItem>[],
-  ): Promise<ContentItem[]> {
-    return this.contentItemRepository.createContentItems(contentItems);
+    return blogContentItems;
   }
 }

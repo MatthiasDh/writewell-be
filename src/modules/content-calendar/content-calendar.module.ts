@@ -3,21 +3,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContentCalendarService } from './content-calendar.service';
 import { ContentCalendarController } from './content-calendar.controller';
 import { ContentCalendar } from './content-calendar.entity';
-import { ContentItem } from '../../entities/content-item.entity';
+import { ContentItem } from '../content-items/content-item.entity';
 import { ContentCalendarRepository } from './content-calendar.repository';
-import { ContentCalendarKeywordsModule } from '../content-calendar-keywords/content-calendar-keywords.module';
+import { ContentItemsModule } from '../content-items/content-items.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([ContentCalendar, ContentItem]),
-    ContentCalendarKeywordsModule,
+    ContentItemsModule,
   ],
   controllers: [ContentCalendarController],
   providers: [ContentCalendarService, ContentCalendarRepository],
-  exports: [
-    ContentCalendarService,
-    ContentCalendarRepository,
-    ContentCalendarKeywordsModule,
-  ],
+  exports: [ContentCalendarService, ContentCalendarRepository],
 })
 export class ContentCalendarModule {}
