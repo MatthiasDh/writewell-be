@@ -1,18 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ContentCalendarResponseDto } from '../../content-calendar/dto/content-calendar-response.dto';
+import { ScheduledContentItem } from '../../scheduled-content-items/scheduled-content-item.entity';
+import { OrganizationSettings } from '../../organization-settings/organization-settings.entity';
 
 export class OrganizationResponseDto {
   @ApiProperty({
     description: 'Organization ID',
-    example: '550e8400-e29b-41d4-a716-446655440000',
+    example: 1,
   })
-  id: string;
+  id: number;
 
   @ApiProperty({
-    description: 'Organization title',
+    description: 'Organization name',
     example: 'My Company',
   })
-  title: string;
+  name: string;
 
   @ApiProperty({
     description: 'Organization description',
@@ -21,20 +22,32 @@ export class OrganizationResponseDto {
   description: string;
 
   @ApiProperty({
-    description: 'Content calendars associated with the organization',
-    type: [ContentCalendarResponseDto],
+    description: 'Organization domain',
+    example: 'mycompany.com',
   })
-  contentCalendars: ContentCalendarResponseDto[];
+  domain: string;
 
   @ApiProperty({
-    description: 'Organization creation date',
-    example: '2023-01-01T00:00:00.000Z',
+    description: 'Target audience segments',
+    example: ['small businesses', 'enterprise clients'],
   })
-  createdAt: Date;
+  target_audience: string[];
 
   @ApiProperty({
-    description: 'Organization last update date',
-    example: '2023-01-01T00:00:00.000Z',
+    description: 'Example blog post URLs',
+    example: ['https://mycompany.com/blog/post1'],
   })
-  updatedAt: Date;
+  example_blog_post_urls: string[];
+
+  @ApiProperty({
+    description: 'Organization settings',
+    type: OrganizationSettings,
+  })
+  settings: OrganizationSettings;
+
+  @ApiProperty({
+    description: 'Scheduled content items',
+    type: [ScheduledContentItem],
+  })
+  scheduled_content_items: ScheduledContentItem[];
 }

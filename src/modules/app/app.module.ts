@@ -10,10 +10,10 @@ import { PuppeteerService } from '../../common/services/puppeteer.service';
 // Import new modules
 import { UsersModule } from '../users/users.module';
 import { OrganizationsModule } from '../organizations/organizations.module';
-import { ContentCalendarModule } from '../content-calendar/content-calendar.module';
-import { ContentItemsModule } from '../content-items/content-items.module';
 import { AuthModule } from '../auth/auth.module';
-import { KeywordModule } from '../keywords/keywords.module';
+import { OrganizationSettingsModule } from '../organization-settings/organization-settings.module';
+import { ScheduledContentItemsModule } from '../scheduled-content-items/scheduled-content-items.module';
+import { BlogPostsModule } from '../blog-posts/blog-posts.module';
 
 import { getDatabaseConfig } from '../../config/database.config';
 import { ClerkClientProvider } from '../../providers/clerk.provider';
@@ -34,10 +34,10 @@ import { LLMService } from '../../common/services/llm.service';
     }),
     UsersModule,
     OrganizationsModule,
-    ContentCalendarModule,
-    ContentItemsModule,
     AuthModule,
-    KeywordModule,
+    OrganizationSettingsModule,
+    ScheduledContentItemsModule,
+    BlogPostsModule,
   ],
   controllers: [AppController],
   providers: [

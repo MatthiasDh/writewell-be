@@ -6,16 +6,20 @@ import {
   UpdateOrganizationParams,
 } from './organizations.type';
 import { LLMService } from '../../common/services/llm.service';
-import { KeywordRepository } from '../keywords/keywords.repository';
 import { DataForSEOService } from '../../common/services/dataforseo.service';
+import { OrganizationsRepository } from './organizations.repository';
+import { Organization } from './organization.entity';
+import { CreateOrganizationDto, UpdateOrganizationDto } from './dto';
 
 @Injectable()
 export class OrganizationsService {
   constructor(
     @Inject('ClerkClient')
     private readonly clerkClient: ClerkClient,
+    private readonly organizationsRepository: OrganizationsRepository,
   ) {}
 
+  // Clerk operations
   async getOrganization(organizationId: string) {
     return this.clerkClient.organizations.getOrganization({ organizationId });
   }
@@ -52,5 +56,41 @@ export class OrganizationsService {
 
   async deleteOrganization(organizationId: string) {
     return this.clerkClient.organizations.deleteOrganization(organizationId);
+  }
+
+  // Database operations
+  async createDatabaseOrganization(
+    data: CreateOrganizationDto,
+  ): Promise<Organization> {
+    return this.organizationsRepository.create(data);
+  }
+
+  async getAllDatabaseOrganizations(): Promise<Organization[]> {
+    return this.organizationsRepository.findAll();
+  }
+
+  async getDatabaseOrganizationById(id: number): Promise<Organization | null> {
+    return this.organizationsRepository.findById(id);
+  }
+
+  async getDatabaseOrganizationByClerkId(
+    clerkId: string,
+  ): Promise<Organization | null> {
+    return this.organizationsRepository.findByClerkId(clerkId);
+  }
+
+  async updateDatabaseOrganization(
+    id: number,
+    data: UpdateOrganizationDto,
+  ): Promise<Organization> {
+    return this.organizationsRepository.update(id, data);
+  }
+
+  async deleteDatabaseOrganization(id: number): Promise<void> {
+    return this.organizationsRepository.delete(id);
+  }
+
+  async deleteDatabaseOrganizationByClerkId(clerkId: string): Promise<void> {
+    return this.organizationsRepository.deleteByClerkId(clerkId);
   }
 }

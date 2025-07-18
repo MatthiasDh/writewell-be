@@ -2,33 +2,29 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrganizationsService } from './organizations.service';
 import { OrganizationsController } from './organizations.controller';
-import { ContentCalendar } from '../content-calendar/content-calendar.entity';
-import { ContentItem } from '../content-items/content-item.entity';
+import { Organization } from './organization.entity';
+import { OrganizationsRepository } from './organizations.repository';
 import { ClerkClientProvider } from '../../providers/clerk.provider';
 import { OrganizationRegistrationService } from '../../flows/organization-registration/organization-registration.service';
 import { UsersService } from '../users/users.service';
-import { ContentCalendarModule } from '../content-calendar/content-calendar.module';
-import { ContentItemsModule } from '../content-items/content-items.module';
-import { KeywordModule } from '../keywords/keywords.module';
+import { UsersRepository } from '../users/users.repository';
+import { User } from '../users/user.entity';
 import { PuppeteerService } from '../../common/services/puppeteer.service';
 import { LLMService } from '../../common/services/llm.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ContentCalendar, ContentItem]),
-    ContentCalendarModule,
-    ContentItemsModule,
-    KeywordModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Organization, User])],
   controllers: [OrganizationsController],
   providers: [
     OrganizationsService,
+    OrganizationsRepository,
     PuppeteerService,
     LLMService,
     ClerkClientProvider,
     UsersService,
+    UsersRepository,
     OrganizationRegistrationService,
   ],
-  exports: [OrganizationsService, TypeOrmModule],
+  exports: [OrganizationsService, OrganizationsRepository, TypeOrmModule],
 })
 export class OrganizationsModule {}
