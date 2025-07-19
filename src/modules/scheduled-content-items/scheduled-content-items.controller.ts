@@ -1,13 +1,12 @@
 import {
   Controller,
   Get,
-  Post,
-  Put,
   Delete,
   Body,
   Param,
   ParseIntPipe,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -30,7 +29,10 @@ export class ScheduledContentItemsController {
 
   @Get(':id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get a scheduled content item by ID' })
+  @ApiOperation({
+    summary: 'Get a scheduled content item by ID',
+    operationId: 'getScheduledContentItem',
+  })
   @ApiParam({
     name: 'id',
     description: 'Scheduled content item ID',
@@ -65,9 +67,12 @@ export class ScheduledContentItemsController {
     return this.scheduledContentItemsService.findByOrganization(organizationId);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a scheduled content item' })
+  @ApiOperation({
+    summary: 'Update a scheduled content item',
+    operationId: 'updateScheduledContentItem',
+  })
   @ApiParam({
     name: 'id',
     description: 'Scheduled content item ID',
@@ -88,7 +93,10 @@ export class ScheduledContentItemsController {
 
   @Delete(':id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete a scheduled content item' })
+  @ApiOperation({
+    summary: 'Delete a scheduled content item',
+    operationId: 'deleteScheduledContentItem',
+  })
   @ApiParam({
     name: 'id',
     description: 'Scheduled content item ID',

@@ -28,7 +28,10 @@ export class BlogPostsController {
 
   @Get()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get all blog posts' })
+  @ApiOperation({
+    summary: 'Get all blog posts',
+    operationId: 'getBlogPosts',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of all blog posts.',
@@ -42,7 +45,10 @@ export class BlogPostsController {
 
   @Get(':id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get a blog post by ID' })
+  @ApiOperation({
+    summary: 'Get a blog post by ID',
+    operationId: 'getBlogPost',
+  })
   @ApiParam({ name: 'id', description: 'Blog post ID', type: 'number' })
   @ApiResponse({
     status: 200,
@@ -56,7 +62,10 @@ export class BlogPostsController {
 
   @Put(':id')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update a blog post' })
+  @ApiOperation({
+    summary: 'Update a blog post',
+    operationId: 'updateBlogPost',
+  })
   @ApiParam({ name: 'id', description: 'Blog post ID', type: 'number' })
   @ApiResponse({
     status: 200,
@@ -69,18 +78,5 @@ export class BlogPostsController {
     @Body(ValidationPipe) data: UpdateBlogPostDto,
   ): Promise<BlogPost> {
     return this.blogPostsService.update(id, data);
-  }
-
-  @Delete(':id')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Delete a blog post' })
-  @ApiParam({ name: 'id', description: 'Blog post ID', type: 'number' })
-  @ApiResponse({
-    status: 204,
-    description: 'The blog post has been deleted successfully.',
-  })
-  @ApiNotFoundResponse({ description: 'Blog post not found' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.blogPostsService.remove(id);
   }
 }

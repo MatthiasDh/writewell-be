@@ -4,6 +4,7 @@ import { OrganizationsService } from './organizations.service';
 import { OrganizationsController } from './organizations.controller';
 import { Organization } from './organization.entity';
 import { OrganizationsRepository } from './organizations.repository';
+import { ClerkOrganizationsRepository } from './clerk-organizations.repository';
 import { ClerkClientProvider } from '../../providers/clerk.provider';
 import { OrganizationRegistrationService } from '../../flows/organization-registration/organization-registration.service';
 import { UsersService } from '../users/users.service';
@@ -18,6 +19,7 @@ import { LLMService } from '../../common/services/llm.service';
   providers: [
     OrganizationsService,
     OrganizationsRepository,
+    ClerkOrganizationsRepository,
     PuppeteerService,
     LLMService,
     ClerkClientProvider,

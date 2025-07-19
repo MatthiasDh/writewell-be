@@ -1,38 +1,36 @@
-import { Inject, Injectable } from '@nestjs/common';
-
-import { ClerkClient } from '@clerk/backend';
+import { Injectable } from '@nestjs/common';
+import { LLMService } from '../../common/services/llm.service';
+import { DataForSEOService } from '../../common/services/dataforseo.service';
+import { OrganizationsRepository } from './organizations.repository';
+import { ClerkOrganizationsRepository } from './clerk-organizations.repository';
+import { Organization } from './organization.entity';
+import { CreateOrganizationDto, UpdateOrganizationDto } from './dto';
 import {
   CreateOrganizationParams,
   UpdateOrganizationParams,
 } from './organizations.type';
-import { LLMService } from '../../common/services/llm.service';
-import { DataForSEOService } from '../../common/services/dataforseo.service';
-import { OrganizationsRepository } from './organizations.repository';
-import { Organization } from './organization.entity';
-import { CreateOrganizationDto, UpdateOrganizationDto } from './dto';
 
 @Injectable()
 export class OrganizationsService {
   constructor(
-    @Inject('ClerkClient')
-    private readonly clerkClient: ClerkClient,
+    private readonly clerkOrganizationsRepository: ClerkOrganizationsRepository,
     private readonly organizationsRepository: OrganizationsRepository,
   ) {}
 
   // Clerk operations
   async getOrganization(organizationId: string) {
-    return this.clerkClient.organizations.getOrganization({ organizationId });
+    return this.clerkOrganizationsRepository.getOrganization(organizationId);
   }
 
   async createOrganization(params: CreateOrganizationParams) {
-    return this.clerkClient.organizations.createOrganization(params);
+    return this.clerkOrganizationsRepository.createOrganization(params);
   }
 
   async updateOrganization(
     organizationId: string,
     params: UpdateOrganizationParams,
   ) {
-    return this.clerkClient.organizations.updateOrganization(
+    return this.clerkOrganizationsRepository.updateOrganization(
       organizationId,
       params,
     );
@@ -43,7 +41,7 @@ export class OrganizationsService {
     title: string,
     description: string,
   ) {
-    return this.clerkClient.organizations.updateOrganizationMetadata(
+    return this.clerkOrganizationsRepository.updateOrganization(
       organizationId,
       {
         publicMetadata: {
@@ -55,7 +53,7 @@ export class OrganizationsService {
   }
 
   async deleteOrganization(organizationId: string) {
-    return this.clerkClient.organizations.deleteOrganization(organizationId);
+    return this.clerkOrganizationsRepository.deleteOrganization(organizationId);
   }
 
   // Database operations

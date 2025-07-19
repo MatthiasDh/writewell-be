@@ -22,8 +22,4 @@ export class BlogPostsService {
   async update(id: number, data: UpdateBlogPostDto): Promise<BlogPost> {
     return this.blogPostsRepository.update(id, data);
   }
-
-  async remove(id: number): Promise<void> {
-    return this.blogPostsRepository.delete(id);
-  }
 }

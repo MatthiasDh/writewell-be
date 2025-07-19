@@ -44,8 +44,4 @@ export class BlogPostsRepository {
     }
     return result;
   }
-
-  async delete(id: number): Promise<void> {
-    await this.blogPostRepository.delete(id);
-  }
 }

@@ -1,42 +1,40 @@
-import { Inject, Injectable } from '@nestjs/common';
-
-import { ClerkClient } from '@clerk/backend';
+import { Injectable } from '@nestjs/common';
+import { UsersRepository } from './users.repository';
+import { ClerkUsersRepository } from './clerk-users.repository';
+import { User } from './user.entity';
+import { CreateUserDto, UpdateUserDto } from './dto';
 import {
   CreateUserParams,
   UpdateUserParams,
   UserListParams,
 } from './users.type';
-import { UsersRepository } from './users.repository';
-import { User } from './user.entity';
-import { CreateUserDto, UpdateUserDto } from './dto';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject('ClerkClient')
-    private readonly clerkClient: ClerkClient,
+    private readonly clerkUsersRepository: ClerkUsersRepository,
     private readonly usersRepository: UsersRepository,
   ) {}
 
   // Clerk operations
   async getAllUsers(params: UserListParams) {
-    return this.clerkClient.users.getUserList(params);
+    return this.clerkUsersRepository.getAllUsers(params);
   }
 
   async getUser(userId: string) {
-    return this.clerkClient.users.getUser(userId);
+    return this.clerkUsersRepository.getUser(userId);
   }
 
   async createUser(params: CreateUserParams) {
-    return this.clerkClient.users.createUser(params);
+    return this.clerkUsersRepository.createUser(params);
   }
 
   async updateUser(userId: string, params: UpdateUserParams) {
-    return this.clerkClient.users.updateUser(userId, params);
+    return this.clerkUsersRepository.updateUser(userId, params);
   }
 
   async deleteUser(userId: string) {
-    return this.clerkClient.users.deleteUser(userId);
+    return this.clerkUsersRepository.deleteUser(userId);
   }
 
   // Database operations
