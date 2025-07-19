@@ -65,7 +65,7 @@ export class OrganizationsController {
     }
   }
 
-  @Get('/')
+  @Get('/current')
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get users current active organization',

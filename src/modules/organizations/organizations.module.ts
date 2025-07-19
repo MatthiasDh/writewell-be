@@ -7,11 +7,10 @@ import { OrganizationsRepository } from './organizations.repository';
 import { ClerkOrganizationsRepository } from './clerk-organizations.repository';
 import { ClerkClientProvider } from '../../providers/clerk.provider';
 import { OrganizationRegistrationService } from '../../flows/organization-registration/organization-registration.service';
-import { UsersService } from '../users/users.service';
-import { UsersRepository } from '../users/users.repository';
 import { User } from '../users/user.entity';
 import { PuppeteerService } from '../../common/services/puppeteer.service';
 import { LLMService } from '../../common/services/llm.service';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Organization, User])],
@@ -23,9 +22,8 @@ import { LLMService } from '../../common/services/llm.service';
     PuppeteerService,
     LLMService,
     ClerkClientProvider,
-    UsersService,
-    UsersRepository,
     OrganizationRegistrationService,
+    UsersModule,
   ],
   exports: [OrganizationsService, OrganizationsRepository, TypeOrmModule],
 })

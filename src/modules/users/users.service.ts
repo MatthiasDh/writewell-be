@@ -16,25 +16,12 @@ export class UsersService {
     private readonly usersRepository: UsersRepository,
   ) {}
 
-  // Clerk operations
-  async getAllUsers(params: UserListParams) {
-    return this.clerkUsersRepository.getAllUsers(params);
-  }
-
   async getUser(userId: string) {
     return this.clerkUsersRepository.getUser(userId);
   }
 
-  async createUser(params: CreateUserParams) {
-    return this.clerkUsersRepository.createUser(params);
-  }
-
   async updateUser(userId: string, params: UpdateUserParams) {
     return this.clerkUsersRepository.updateUser(userId, params);
-  }
-
-  async deleteUser(userId: string) {
-    return this.clerkUsersRepository.deleteUser(userId);
   }
 
   // Database operations

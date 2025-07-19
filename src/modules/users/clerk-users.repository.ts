@@ -1,10 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ClerkClient } from '@clerk/backend';
-import {
-  CreateUserParams,
-  UpdateUserParams,
-  UserListParams,
-} from './users.type';
+import { UpdateUserParams } from './users.type';
 
 @Injectable()
 export class ClerkUsersRepository {

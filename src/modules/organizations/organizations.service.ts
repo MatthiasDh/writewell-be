@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { LLMService } from '../../common/services/llm.service';
-import { DataForSEOService } from '../../common/services/dataforseo.service';
 import { OrganizationsRepository } from './organizations.repository';
 import { ClerkOrganizationsRepository } from './clerk-organizations.repository';
 import { Organization } from './organization.entity';
