@@ -17,19 +17,6 @@ export class OrganizationSettingsRepository {
     return this.organizationSettingsRepository.save(settings);
   }
 
-  async findAll(): Promise<OrganizationSettings[]> {
-    return this.organizationSettingsRepository.find({
-      relations: ['organization'],
-    });
-  }
-
-  async findById(id: number): Promise<OrganizationSettings | null> {
-    return this.organizationSettingsRepository.findOne({
-      where: { id },
-      relations: ['organization'],
-    });
-  }
-
   async findByOrganizationId(
     organizationId: number,
   ): Promise<OrganizationSettings | null> {
@@ -52,9 +39,5 @@ export class OrganizationSettingsRepository {
       throw new Error(`Organization settings with id ${id} not found`);
     }
     return result;
-  }
-
-  async delete(id: number): Promise<void> {
-    await this.organizationSettingsRepository.delete(id);
   }
 }

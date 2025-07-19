@@ -18,14 +18,6 @@ export class OrganizationSettingsService {
     return this.organizationSettingsRepository.create(data);
   }
 
-  async findAll(): Promise<OrganizationSettings[]> {
-    return this.organizationSettingsRepository.findAll();
-  }
-
-  async findOne(id: number): Promise<OrganizationSettings | null> {
-    return this.organizationSettingsRepository.findById(id);
-  }
-
   async findByOrganizationId(
     organizationId: number,
   ): Promise<OrganizationSettings | null> {
@@ -39,9 +31,5 @@ export class OrganizationSettingsService {
     data: UpdateOrganizationSettingsDto,
   ): Promise<OrganizationSettings> {
     return this.organizationSettingsRepository.update(id, data);
-  }
-
-  async remove(id: number): Promise<void> {
-    return this.organizationSettingsRepository.delete(id);
   }
 }

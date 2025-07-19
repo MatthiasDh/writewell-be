@@ -26,20 +26,6 @@ import { CreateBlogPostDto, UpdateBlogPostDto } from './dto';
 export class BlogPostsController {
   constructor(private readonly blogPostsService: BlogPostsService) {}
 
-  @Post()
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a blog post' })
-  @ApiResponse({
-    status: 201,
-    description: 'The blog post has been created successfully.',
-    type: BlogPost,
-  })
-  async create(
-    @Body(ValidationPipe) data: CreateBlogPostDto,
-  ): Promise<BlogPost> {
-    return this.blogPostsService.create(data);
-  }
-
   @Get()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all blog posts' })
@@ -48,8 +34,10 @@ export class BlogPostsController {
     description: 'List of all blog posts.',
     type: [BlogPost],
   })
-  async findAll(): Promise<BlogPost[]> {
-    return this.blogPostsService.findAll();
+  async findAllByOrganizationId(
+    @Param('organizationId', ParseIntPipe) organizationId: number,
+  ): Promise<BlogPost[]> {
+    return this.blogPostsService.findAllByOrganizationId(organizationId);
   }
 
   @Get(':id')

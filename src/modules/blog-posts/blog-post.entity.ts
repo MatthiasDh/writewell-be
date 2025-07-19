@@ -5,9 +5,12 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToOne,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { ScheduledContentItem } from '../scheduled-content-items/scheduled-content-item.entity';
+import { Organization } from '../organizations/organization.entity';
 
 @Entity('blog_posts')
 export class BlogPost {
@@ -61,4 +64,19 @@ export class BlogPost {
   })
   @OneToOne(() => ScheduledContentItem, (item) => item.blog_post)
   scheduled_content_item: ScheduledContentItem;
+
+  @ApiProperty({
+    description: 'Organization that owns this blog post',
+    type: () => Organization,
+  })
+  @ManyToOne(() => Organization, (organization) => organization.blog_posts)
+  @JoinColumn({ name: 'organization_id' })
+  organization: Organization;
+
+  @ApiProperty({
+    description: 'Organization ID',
+    example: 1,
+  })
+  @Column({ nullable: false })
+  organization_id: number;
 }

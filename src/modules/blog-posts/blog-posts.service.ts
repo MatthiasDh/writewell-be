@@ -11,8 +11,8 @@ export class BlogPostsService {
     return this.blogPostsRepository.create(data);
   }
 
-  async findAll(): Promise<BlogPost[]> {
-    return this.blogPostsRepository.findAll();
+  async findAllByOrganizationId(organizationId: number): Promise<BlogPost[]> {
+    return this.blogPostsRepository.findAllByOrganizationId(organizationId);
   }
 
   async findOne(id: number): Promise<BlogPost> {

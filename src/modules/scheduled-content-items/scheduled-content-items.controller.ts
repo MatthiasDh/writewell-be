@@ -19,10 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { ScheduledContentItemsService } from './scheduled-content-items.service';
 import { ScheduledContentItem } from './scheduled-content-item.entity';
-import {
-  CreateScheduledContentItemDto,
-  UpdateScheduledContentItemDto,
-} from './dto';
+import { UpdateScheduledContentItemDto } from './dto';
 
 @ApiTags('scheduled-content-items')
 @Controller('scheduled-content-items')
@@ -30,20 +27,6 @@ export class ScheduledContentItemsController {
   constructor(
     private readonly scheduledContentItemsService: ScheduledContentItemsService,
   ) {}
-
-  @Post()
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create a scheduled content item' })
-  @ApiResponse({
-    status: 201,
-    description: 'The scheduled content item has been created successfully.',
-    type: ScheduledContentItem,
-  })
-  async create(
-    @Body(ValidationPipe) data: CreateScheduledContentItemDto,
-  ): Promise<ScheduledContentItem> {
-    return this.scheduledContentItemsService.create(data);
-  }
 
   @Get(':id')
   @ApiBearerAuth()
@@ -65,13 +48,11 @@ export class ScheduledContentItemsController {
     return this.scheduledContentItemsService.findOne(id);
   }
 
-  @Get('organization/:organizationId')
+  @Get()
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get scheduled content items for an organization' })
-  @ApiParam({
-    name: 'organizationId',
-    description: 'Organization ID',
-    type: 'number',
+  @ApiOperation({
+    summary: 'Get scheduled content items for an organization',
+    operationId: 'getScheduledContentItems',
   })
   @ApiResponse({
     status: 200,

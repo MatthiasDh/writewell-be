@@ -11,6 +11,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { OrganizationSettings } from '../organization-settings/organization-settings.entity';
 import { ScheduledContentItem } from '../scheduled-content-items/scheduled-content-item.entity';
 import { User } from '../users/user.entity';
+import { BlogPost } from '../blog-posts/blog-post.entity';
 
 @Entity('organizations')
 export class Organization {
@@ -98,4 +99,12 @@ export class Organization {
     inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   users: User[];
+
+  @ApiProperty({
+    description: 'Blog posts belonging to this organization',
+    type: () => BlogPost,
+    isArray: true,
+  })
+  @OneToMany(() => BlogPost, (blogPost) => blogPost.organization)
+  blog_posts: BlogPost[];
 }

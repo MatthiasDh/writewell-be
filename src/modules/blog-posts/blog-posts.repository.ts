@@ -15,8 +15,9 @@ export class BlogPostsRepository {
     return this.blogPostRepository.save(blogPost);
   }
 
-  async findAll(): Promise<BlogPost[]> {
+  async findAllByOrganizationId(organizationId: number): Promise<BlogPost[]> {
     return this.blogPostRepository.find({
+      where: { organization_id: organizationId },
       relations: ['scheduled_content_item'],
     });
   }
