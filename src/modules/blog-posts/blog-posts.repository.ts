@@ -15,14 +15,14 @@ export class BlogPostsRepository {
     return this.blogPostRepository.save(blogPost);
   }
 
-  async findAllByOrganizationId(organizationId: number): Promise<BlogPost[]> {
+  async findAllByOrganizationId(organizationId: string): Promise<BlogPost[]> {
     return this.blogPostRepository.find({
       where: { organization_id: organizationId },
       relations: ['scheduled_content_item'],
     });
   }
 
-  async findById(id: number): Promise<BlogPost> {
+  async findById(id: string): Promise<BlogPost> {
     const result = await this.blogPostRepository.findOne({
       where: { id },
       relations: ['scheduled_content_item'],
@@ -33,7 +33,7 @@ export class BlogPostsRepository {
     return result;
   }
 
-  async update(id: number, data: Partial<BlogPost>): Promise<BlogPost> {
+  async update(id: string, data: Partial<BlogPost>): Promise<BlogPost> {
     await this.blogPostRepository.update(id, data);
     const result = await this.blogPostRepository.findOne({
       where: { id },

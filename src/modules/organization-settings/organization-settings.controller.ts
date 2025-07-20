@@ -6,8 +6,8 @@ import {
   Delete,
   Body,
   Param,
-  ParseIntPipe,
   ValidationPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -38,7 +38,7 @@ export class OrganizationSettingsController {
   })
   @ApiNotFoundResponse({ description: 'Organization settings not found' })
   async findByOrganizationId(
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
   ): Promise<OrganizationSettings | null> {
     return this.organizationSettingsService.findByOrganizationId(
       organizationId,
@@ -51,7 +51,7 @@ export class OrganizationSettingsController {
     summary: 'Update organization settings',
     operationId: 'updateOrganizationSettings',
   })
-  @ApiParam({ name: 'id', description: 'Settings ID', type: 'number' })
+  @ApiParam({ name: 'id', description: 'Settings ID', type: 'string' })
   @ApiResponse({
     status: 200,
     description: 'Organization settings updated successfully',
@@ -59,7 +59,7 @@ export class OrganizationSettingsController {
   })
   @ApiNotFoundResponse({ description: 'Organization settings not found' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateSettingsDto: UpdateOrganizationSettingsDto,
   ): Promise<OrganizationSettings> {
     return this.organizationSettingsService.update(id, updateSettingsDto);

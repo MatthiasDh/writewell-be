@@ -19,7 +19,7 @@ export class OrganizationSettingsService {
   }
 
   async findByOrganizationId(
-    organizationId: number,
+    organizationId: string,
   ): Promise<OrganizationSettings | null> {
     return this.organizationSettingsRepository.findByOrganizationId(
       organizationId,
@@ -27,7 +27,7 @@ export class OrganizationSettingsService {
   }
 
   async update(
-    id: number,
+    id: string,
     data: UpdateOrganizationSettingsDto,
   ): Promise<OrganizationSettings> {
     return this.organizationSettingsRepository.update(id, data);

@@ -3,7 +3,7 @@ import { ClerkClient } from '@clerk/backend';
 import {
   CreateOrganizationParams,
   UpdateOrganizationParams,
-} from './organizations.type';
+} from '../modules/organizations/organizations.type';
 
 @Injectable()
 export class ClerkOrganizationsRepository {
@@ -32,6 +32,18 @@ export class ClerkOrganizationsRepository {
       organizationId,
       params,
     );
+  }
+
+  async addUserToOrganization(
+    organizationId: string,
+    clerkUserId: string,
+    role: 'admin' | 'member',
+  ) {
+    return this.clerkClient.organizations.createOrganizationMembership({
+      organizationId,
+      userId: clerkUserId,
+      role,
+    });
   }
 
   async deleteOrganization(organizationId: string) {

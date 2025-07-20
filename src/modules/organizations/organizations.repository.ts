@@ -21,7 +21,7 @@ export class OrganizationsRepository {
     });
   }
 
-  async findById(id: number): Promise<Organization | null> {
+  async findById(id: string): Promise<Organization | null> {
     return this.organizationRepository.findOne({
       where: { id },
       relations: ['settings', 'scheduled_content_items', 'users'],
@@ -35,7 +35,7 @@ export class OrganizationsRepository {
     });
   }
 
-  async update(id: number, data: Partial<Organization>): Promise<Organization> {
+  async update(id: string, data: Partial<Organization>): Promise<Organization> {
     await this.organizationRepository.update(id, data);
     const result = await this.organizationRepository.findOne({
       where: { id },
@@ -47,7 +47,7 @@ export class OrganizationsRepository {
     return result;
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.organizationRepository.delete(id);
   }
 

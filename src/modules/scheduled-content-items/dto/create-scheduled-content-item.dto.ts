@@ -1,9 +1,8 @@
 import {
-  IsNumber,
+  IsString,
   IsDateString,
   IsEnum,
   IsOptional,
-  IsString,
   IsObject,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
@@ -12,10 +11,10 @@ import { ContentStatus, ContentType } from '../scheduled-content-item.entity';
 export class CreateScheduledContentItemDto {
   @ApiProperty({
     description: 'Organization ID',
-    example: 1,
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  @IsNumber()
-  organization_id: number;
+  @IsString()
+  organization_id: string;
 
   @ApiProperty({
     description: 'Scheduled date',

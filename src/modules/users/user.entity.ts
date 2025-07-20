@@ -12,10 +12,10 @@ import { Organization } from '../organizations/organization.entity';
 export class User {
   @ApiProperty({
     description: 'User ID',
-    example: 1,
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ApiProperty({
     description: 'Clerk user ID',
@@ -24,6 +24,34 @@ export class User {
   @Column({ unique: true, nullable: false })
   clerk_user_id: string;
 
+  @ApiProperty({
+    description: 'User first name',
+    example: 'John',
+  })
+  @Column({ nullable: true })
+  first_name: string;
+
+  @ApiProperty({
+    description: 'User last name',
+    example: 'Doe',
+  })
+  @Column({ nullable: true })
+  last_name: string;
+
+  @ApiProperty({
+    description: 'User email address',
+    example: 'john.doe@example.com',
+  })
+  @Column({ nullable: true })
+  email_address: string;
+
+  @ApiProperty({
+    description: 'User profile image URL',
+    example: 'https://example.com/profile.jpg',
+  })
+  @Column({ nullable: true })
+  image_url: string;
+
   // Relationships
   @ApiProperty({
     description: 'Organizations this user belongs to',
@@ -31,10 +59,5 @@ export class User {
     isArray: true,
   })
   @ManyToMany(() => Organization, (organization) => organization.users)
-  @JoinTable({
-    name: 'user_organizations',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'organization_id', referencedColumnName: 'id' },
-  })
   organizations: Organization[];
 }

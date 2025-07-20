@@ -7,7 +7,6 @@ import {
   Delete,
   ValidationPipe,
   ParseUUIDPipe,
-  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -41,7 +40,7 @@ export class UsersController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) updateUserDto: any,
   ) {
-    return this.usersService.updateUser(id, updateUserDto);
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Get('/')
@@ -52,23 +51,21 @@ export class UsersController {
     description: 'Users retrieved successfully',
     type: [User],
   })
-  async getAllDatabaseUsers(): Promise<User[]> {
-    return this.usersService.getAllDatabaseUsers();
+  async getAll(): Promise<User[]> {
+    return this.usersService.getAllUsers();
   }
 
   @Get('/:id')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get a user by ID', operationId: 'getUser' })
-  @ApiParam({ name: 'id', description: 'User ID', type: 'number' })
+  @ApiParam({ name: 'id', description: 'User ID', type: 'string' })
   @ApiResponse({
     status: 200,
     description: 'User retrieved successfully',
     type: User,
   })
   @ApiNotFoundResponse({ description: 'User not found' })
-  async getDatabaseUserById(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<User | null> {
-    return this.usersService.getDatabaseUserById(id);
+  async getById(@Param('id', ParseUUIDPipe) id: string): Promise<User | null> {
+    return this.usersService.getUserById(id);
   }
 }

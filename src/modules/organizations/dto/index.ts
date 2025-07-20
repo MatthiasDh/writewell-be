@@ -1,4 +1,3 @@
-export * from './create-organization.dto';
 export * from './update-organization.dto';
 export * from './create-organization-keyword.dto';
 export * from './create-organization-request.dto';

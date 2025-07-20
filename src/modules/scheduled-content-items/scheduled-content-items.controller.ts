@@ -4,9 +4,9 @@ import {
   Delete,
   Body,
   Param,
-  ParseIntPipe,
   ValidationPipe,
   Patch,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -36,7 +36,7 @@ export class ScheduledContentItemsController {
   @ApiParam({
     name: 'id',
     description: 'Scheduled content item ID',
-    type: 'number',
+    type: 'string',
   })
   @ApiResponse({
     status: 200,
@@ -45,7 +45,7 @@ export class ScheduledContentItemsController {
   })
   @ApiNotFoundResponse({ description: 'Scheduled content item not found' })
   async findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
   ): Promise<ScheduledContentItem> {
     return this.scheduledContentItemsService.findOne(id);
   }
@@ -62,7 +62,7 @@ export class ScheduledContentItemsController {
     type: [ScheduledContentItem],
   })
   async findByOrganization(
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
   ): Promise<ScheduledContentItem[]> {
     return this.scheduledContentItemsService.findByOrganization(organizationId);
   }
@@ -76,7 +76,7 @@ export class ScheduledContentItemsController {
   @ApiParam({
     name: 'id',
     description: 'Scheduled content item ID',
-    type: 'number',
+    type: 'string',
   })
   @ApiResponse({
     status: 200,
@@ -85,7 +85,7 @@ export class ScheduledContentItemsController {
   })
   @ApiNotFoundResponse({ description: 'Scheduled content item not found' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) data: UpdateScheduledContentItemDto,
   ): Promise<ScheduledContentItem> {
     return this.scheduledContentItemsService.update(id, data);
@@ -100,14 +100,14 @@ export class ScheduledContentItemsController {
   @ApiParam({
     name: 'id',
     description: 'Scheduled content item ID',
-    type: 'number',
+    type: 'string',
   })
   @ApiResponse({
     status: 204,
     description: 'The scheduled content item has been deleted successfully.',
   })
   @ApiNotFoundResponse({ description: 'Scheduled content item not found' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async remove(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
     return this.scheduledContentItemsService.remove(id);
   }
 }

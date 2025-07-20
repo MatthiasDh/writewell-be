@@ -4,7 +4,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { User } from './user.entity';
 import { UsersRepository } from './users.repository';
-import { ClerkUsersRepository } from './clerk-users.repository';
+import { ClerkUsersRepository } from '../../repositories/clerk-users.repository';
 import { ClerkClientProvider } from '../../providers/clerk.provider';
 
 @Module({

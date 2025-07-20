@@ -18,7 +18,7 @@ export class ScheduledContentItemsRepository {
     return this.scheduledContentItemRepository.save(scheduledContentItem);
   }
 
-  async findById(id: number): Promise<ScheduledContentItem> {
+  async findById(id: string): Promise<ScheduledContentItem> {
     const result = await this.scheduledContentItemRepository.findOne({
       where: { id },
       relations: ['blog_post', 'organization'],
@@ -30,7 +30,7 @@ export class ScheduledContentItemsRepository {
   }
 
   async findByOrganization(
-    organizationId: number,
+    organizationId: string,
   ): Promise<ScheduledContentItem[]> {
     return this.scheduledContentItemRepository.find({
       where: { organization_id: organizationId },
@@ -39,7 +39,7 @@ export class ScheduledContentItemsRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     data: Partial<ScheduledContentItem>,
   ): Promise<ScheduledContentItem> {
     await this.scheduledContentItemRepository.update(id, data);
@@ -53,7 +53,7 @@ export class ScheduledContentItemsRepository {
     return result;
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.scheduledContentItemRepository.delete(id);
   }
 }

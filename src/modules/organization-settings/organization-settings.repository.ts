@@ -18,7 +18,7 @@ export class OrganizationSettingsRepository {
   }
 
   async findByOrganizationId(
-    organizationId: number,
+    organizationId: string,
   ): Promise<OrganizationSettings | null> {
     return this.organizationSettingsRepository.findOne({
       where: { organization_id: organizationId },
@@ -27,7 +27,7 @@ export class OrganizationSettingsRepository {
   }
 
   async update(
-    id: number,
+    id: string,
     data: Partial<OrganizationSettings>,
   ): Promise<OrganizationSettings> {
     await this.organizationSettingsRepository.update(id, data);

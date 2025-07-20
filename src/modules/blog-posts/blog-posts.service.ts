@@ -11,15 +11,15 @@ export class BlogPostsService {
     return this.blogPostsRepository.create(data);
   }
 
-  async findAllByOrganizationId(organizationId: number): Promise<BlogPost[]> {
+  async findAllByOrganizationId(organizationId: string): Promise<BlogPost[]> {
     return this.blogPostsRepository.findAllByOrganizationId(organizationId);
   }
 
-  async findOne(id: number): Promise<BlogPost> {
+  async findOne(id: string): Promise<BlogPost> {
     return this.blogPostsRepository.findById(id);
   }
 
-  async update(id: number, data: UpdateBlogPostDto): Promise<BlogPost> {
+  async update(id: string, data: UpdateBlogPostDto): Promise<BlogPost> {
     return this.blogPostsRepository.update(id, data);
   }
 }

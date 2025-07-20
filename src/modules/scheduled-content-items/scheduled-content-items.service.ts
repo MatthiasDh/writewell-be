@@ -22,12 +22,12 @@ export class ScheduledContentItemsService {
     return this.scheduledContentItemsRepository.create(processedData);
   }
 
-  async findOne(id: number): Promise<ScheduledContentItem> {
+  async findOne(id: string): Promise<ScheduledContentItem> {
     return this.scheduledContentItemsRepository.findById(id);
   }
 
   async findByOrganization(
-    organizationId: number,
+    organizationId: string,
   ): Promise<ScheduledContentItem[]> {
     return this.scheduledContentItemsRepository.findByOrganization(
       organizationId,
@@ -35,7 +35,7 @@ export class ScheduledContentItemsService {
   }
 
   async update(
-    id: number,
+    id: string,
     data: UpdateScheduledContentItemDto,
   ): Promise<ScheduledContentItem> {
     const processedData = {
@@ -47,7 +47,7 @@ export class ScheduledContentItemsService {
     return this.scheduledContentItemsRepository.update(id, processedData);
   }
 
-  async remove(id: number): Promise<void> {
+  async remove(id: string): Promise<void> {
     return this.scheduledContentItemsRepository.delete(id);
   }
 }

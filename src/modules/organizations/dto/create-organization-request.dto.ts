@@ -41,6 +41,5 @@ export class CreateOrganizationRequestDto {
     ],
   })
   @IsArray()
-  @IsUUID('4', { each: true })
-  relevantKeywordIds: string[];
+  exampleBlogPostUrls: string[];
 }

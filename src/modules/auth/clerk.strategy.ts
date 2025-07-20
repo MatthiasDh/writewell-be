@@ -28,7 +28,7 @@ export class ClerkStrategy extends PassportStrategy(Strategy, 'clerk') {
         secretKey: this.configService.get('CLERK_SECRET_KEY'),
       });
 
-      const user = await this.usersService.getUser(tokenPayload.sub);
+      const user = await this.usersService.getUserByClerkId(tokenPayload.sub);
 
       return { ...user, orgId: tokenPayload.org_id } as UserWithOrg;
     } catch (error) {

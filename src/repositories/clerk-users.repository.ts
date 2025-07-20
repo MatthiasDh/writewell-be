@@ -1,6 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ClerkClient } from '@clerk/backend';
-import { UpdateUserParams } from './users.type';
 
 @Injectable()
 export class ClerkUsersRepository {
@@ -13,7 +12,7 @@ export class ClerkUsersRepository {
     return this.clerkClient.users.getUser(userId);
   }
 
-  async updateUser(userId: string, params: UpdateUserParams) {
+  async updateUser(userId: string, params: any) {
     return this.clerkClient.users.updateUser(userId, params);
   }
 }

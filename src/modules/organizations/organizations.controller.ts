@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   ValidationPipe,
-  ParseIntPipe,
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
@@ -22,8 +21,10 @@ import { OrganizationsService } from './organizations.service';
 import { PuppeteerService } from '../../common/services/puppeteer.service';
 import { OrganizationSummaryRequestDto } from './dto/generate-summary-request.dto';
 import { OrganizationSummaryResponseDto } from './dto/generate-summary-response.dto';
-import { UpdateOrganizationDto } from './dto';
+import { CreateOrganizationRequestDto, UpdateOrganizationDto } from './dto';
 import { Organization } from './organization.entity';
+import { CurrentUser } from '../../decorators/current-user.decorator';
+import { User } from '../users/user.entity';
 
 @ApiTags('organizations')
 @Controller('organizations')
@@ -32,6 +33,25 @@ export class OrganizationsController {
     private readonly organizationsService: OrganizationsService,
     private readonly puppeteerService: PuppeteerService,
   ) {}
+
+  @Post('/keywords')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get keywords for an organization',
+    operationId: 'getOrganizationKeywords',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Organization created successfully',
+    type: Organization,
+  })
+  async getOrganizationKeywords(
+    @Body() organizationSummaryRequest: OrganizationSummaryRequestDto,
+  ): Promise<{ keywords: string[] }> {
+    return {
+      keywords: [],
+    };
+  }
 
   @Post('/summary')
   @ApiBearerAuth()
@@ -44,7 +64,7 @@ export class OrganizationsController {
     description: 'Summary generated successfully',
     type: OrganizationSummaryResponseDto,
   })
-  async generateSummary(
+  async summary(
     @Body() organizationSummaryRequest: OrganizationSummaryRequestDto,
   ): Promise<OrganizationSummaryResponseDto> {
     try {
@@ -94,20 +114,41 @@ export class OrganizationsController {
     summary: 'Update a database organization',
     operationId: 'updateOrganization',
   })
-  @ApiParam({ name: 'id', description: 'Organization ID', type: 'number' })
+  @ApiParam({ name: 'id', description: 'Organization ID', type: 'string' })
   @ApiResponse({
     status: 200,
     description: 'Organization updated successfully',
     type: Organization,
   })
   @ApiNotFoundResponse({ description: 'Organization not found' })
-  async updateDatabaseOrganization(
-    @Param('id', ParseIntPipe) id: number,
+  async updateOrganization(
+    @Param('id') id: string,
     @Body(ValidationPipe) updateOrganizationDto: UpdateOrganizationDto,
   ): Promise<Organization> {
     return this.organizationsService.updateDatabaseOrganization(
       id,
       updateOrganizationDto,
+    );
+  }
+
+  @Post('/')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create a new organization',
+    operationId: 'createOrganization',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Organization created successfully',
+    type: Organization,
+  })
+  async createOrganization(
+    @CurrentUser() currentUser: User,
+    @Body() createOrganizationDto: CreateOrganizationRequestDto,
+  ): Promise<string> {
+    return this.organizationsService.create(
+      currentUser.id,
+      createOrganizationDto,
     );
   }
 }

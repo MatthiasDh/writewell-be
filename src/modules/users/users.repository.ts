@@ -21,7 +21,7 @@ export class UsersRepository {
     });
   }
 
-  async findById(id: number): Promise<User | null> {
+  async findById(id: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id },
       relations: ['organizations'],
@@ -35,7 +35,7 @@ export class UsersRepository {
     });
   }
 
-  async update(id: number, data: Partial<User>): Promise<User> {
+  async update(id: string, data: Partial<User>): Promise<User> {
     await this.userRepository.update(id, data);
     const result = await this.userRepository.findOne({
       where: { id },
@@ -47,7 +47,7 @@ export class UsersRepository {
     return result;
   }
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     await this.userRepository.delete(id);
   }
 

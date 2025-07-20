@@ -6,8 +6,8 @@ import {
   Delete,
   Body,
   Param,
-  ParseIntPipe,
   ValidationPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -38,7 +38,7 @@ export class BlogPostsController {
     type: [BlogPost],
   })
   async findAllByOrganizationId(
-    @Param('organizationId', ParseIntPipe) organizationId: number,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
   ): Promise<BlogPost[]> {
     return this.blogPostsService.findAllByOrganizationId(organizationId);
   }
@@ -49,14 +49,14 @@ export class BlogPostsController {
     summary: 'Get a blog post by ID',
     operationId: 'getBlogPost',
   })
-  @ApiParam({ name: 'id', description: 'Blog post ID', type: 'number' })
+  @ApiParam({ name: 'id', description: 'Blog post ID', type: 'string' })
   @ApiResponse({
     status: 200,
     description: 'The blog post details.',
     type: BlogPost,
   })
   @ApiNotFoundResponse({ description: 'Blog post not found' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<BlogPost> {
+  async findOne(@Param('id', ParseUUIDPipe) id: string): Promise<BlogPost> {
     return this.blogPostsService.findOne(id);
   }
 
@@ -66,7 +66,7 @@ export class BlogPostsController {
     summary: 'Update a blog post',
     operationId: 'updateBlogPost',
   })
-  @ApiParam({ name: 'id', description: 'Blog post ID', type: 'number' })
+  @ApiParam({ name: 'id', description: 'Blog post ID', type: 'string' })
   @ApiResponse({
     status: 200,
     description: 'The blog post has been updated successfully.',
@@ -74,7 +74,7 @@ export class BlogPostsController {
   })
   @ApiNotFoundResponse({ description: 'Blog post not found' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body(ValidationPipe) data: UpdateBlogPostDto,
   ): Promise<BlogPost> {
     return this.blogPostsService.update(id, data);

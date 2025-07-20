@@ -16,10 +16,10 @@ import { Organization } from '../organizations/organization.entity';
 export class BlogPost {
   @ApiProperty({
     description: 'Blog post ID',
-    example: 1,
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ApiProperty({
     description: 'Blog post title',
@@ -75,8 +75,8 @@ export class BlogPost {
 
   @ApiProperty({
     description: 'Organization ID',
-    example: 1,
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @Column({ nullable: false })
-  organization_id: number;
+  organization_id: string;
 }

@@ -26,17 +26,17 @@ export enum ContentType {
 export class ScheduledContentItem {
   @ApiProperty({
     description: 'Scheduled content item ID',
-    example: 1,
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ApiProperty({
     description: 'Organization ID',
-    example: 1,
+    example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @Column()
-  organization_id: number;
+  organization_id: string;
 
   @ApiProperty({
     description: 'Scheduled date',
